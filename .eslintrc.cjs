@@ -20,5 +20,6 @@ module.exports = {
 	},
 	rules: {
 		indent: [0, 2, { SwitchCase: 1 }],
+		lineBreakStyle: "auto"
 	},
 };
