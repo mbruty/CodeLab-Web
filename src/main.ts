@@ -20,6 +20,7 @@ loadFonts();
 const httpLink = createHttpLink({
 	// You should use an absolute URL here
 	uri: "http://localhost:8080/graphql",
+	credentials: "include",
 });
 const cache = new InMemoryCache();
 const apolloClient = new ApolloClient({

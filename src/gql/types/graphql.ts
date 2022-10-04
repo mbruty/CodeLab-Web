@@ -308,9 +308,9 @@ export type User = {
   __typename?: 'User';
   email: Scalars['String'];
   id?: Maybe<Scalars['Int']>;
-  password: Scalars['String'];
   refreshCount: Scalars['Int'];
   username: Scalars['String'];
+  xp: Scalars['Int'];
 };
 
 export type _Service = {
