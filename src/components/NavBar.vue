@@ -1,11 +1,11 @@
 <template>
-	<v-card v-if="nav.enabled">
+	<v-card v-if="nav.enabled" style="z-index: 1">
 		<v-layout>
 			<v-navigation-drawer expand-on-hover rail>
 				<v-list>
 					<v-list-item>
 						<div class="avatar-container">
-							<img width="24" :src="imageUrl" alt="Avatar" />
+							<img :src="imageUrl" alt="Avatar" width="24"/>
 							<h2>{{ userStore.user.username }}</h2>
 						</div>
 					</v-list-item>
@@ -21,7 +21,7 @@
 									<div class="xp-indicator">{{ xpRemaining }}</div>
 									<div class="xp-indicator">100</div>
 								</div>
-								<v-progress-linear :model-value="xpRemaining" rounded />
+								<v-progress-linear :model-value="xpRemaining" rounded/>
 							</div>
 						</div>
 					</v-list-item>
@@ -29,23 +29,25 @@
 
 				<v-divider></v-divider>
 
-				<v-list density="compact" nav v-for="item in navItems">
+				<v-list v-for="item in navItems" density="compact" nav>
 					<router-link :to="item.url"
-						><v-list-item
+					>
+						<v-list-item
 							:prepend-icon="item.icon"
 							:title="item.title"
 						></v-list-item
-					></router-link>
+						>
+					</router-link>
 				</v-list>
 			</v-navigation-drawer>
 		</v-layout>
 	</v-card>
 </template>
 
-<script setup lang="ts">
-import { useNavigationStore } from "@/stores/navigationStore";
-import { computed } from "vue";
-import { useUserStore } from "../stores/userStore";
+<script lang="ts" setup>
+import {useNavigationStore} from "@/stores/navigationStore";
+import {computed} from "vue";
+import {useUserStore} from "../stores/userStore";
 
 const userStore = useUserStore();
 const nav = useNavigationStore();
@@ -79,9 +81,11 @@ const xpRemaining = computed(() => userStore.user?.xp % 100);
 	display: flex;
 	flex-direction: row;
 }
+
 .avatar-container h2 {
 	padding-left: 1em;
 }
+
 .level-container {
 	display: flex;
 	flex-direction: row;
@@ -100,6 +104,7 @@ const xpRemaining = computed(() => userStore.user?.xp % 100);
 	width: 100%;
 	margin-left: 15px;
 }
+
 .xp-progress {
 	display: flex;
 	flex-direction: row;

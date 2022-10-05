@@ -20,6 +20,7 @@
     "@vue/apollo-composable": "^4.0.0-alpha.19",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
+    "monaco-editor-vue3": "^0.1.6",
     "pinia": "^2.0.21",
     "roboto-fontface": "*",
     "vue": "^3.2.38",
@@ -29,6 +30,8 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.13.2",
+    "@graphql-codegen/client-preset": "1.0.2",
+    "@graphql-codegen/introspection": "2.2.1",
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/jsdom": "^20.0.0",
     "@types/node": "^16.11.56",
@@ -52,8 +55,6 @@
     "vite-plugin-vuetify": "^1.0.0-alpha.12",
     "vitest": "^0.23.0",
     "vue-cli-plugin-vuetify": "~2.5.8",
-    "vue-tsc": "^0.40.7",
-    "@graphql-codegen/introspection": "2.2.1",
-    "@graphql-codegen/client-preset": "1.0.2"
+    "vue-tsc": "^0.40.7"
   }
 }

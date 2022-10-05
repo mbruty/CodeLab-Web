@@ -4548,6 +4548,20 @@
   "resolved" "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   "version" "1.0.4"
 
+"monaco-editor-vue3@^0.1.6":
+  "integrity" "sha512-jJxErTfP+cHCZtg/Ii5CsVX3VXNpMBevlbU6X9R1yggP+/QD3u1Ox+W1k9s3uTt3apF3k48B++QDbIGLYBv9HA=="
+  "resolved" "https://registry.npmjs.org/monaco-editor-vue3/-/monaco-editor-vue3-0.1.6.tgz"
+  "version" "0.1.6"
+  dependencies:
+    "monaco-editor" "^0.33.0"
+    "vite-plugin-monaco-editor" "^1.1.0"
+    "vue" "^3.2.37"
+
+"monaco-editor@^0.33.0", "monaco-editor@>=0.33.0":
+  "integrity" "sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw=="
+  "resolved" "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.33.0.tgz"
+  "version" "0.33.0"
+
 "ms@^2.1.1", "ms@2.1.2":
   "integrity" "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w=="
   "resolved" "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
@@ -6102,6 +6116,11 @@
     "core-util-is" "1.0.2"
     "extsprintf" "^1.2.0"
 
+"vite-plugin-monaco-editor@^1.1.0":
+  "integrity" "sha512-IvtUqZotrRoVqwT0PBBDIZPNraya3BxN/bfcNfnxZ5rkJiGcNtO5eAOWWSgT7zullIAEqQwxMU83yL9J5k7gww=="
+  "resolved" "https://registry.npmjs.org/vite-plugin-monaco-editor/-/vite-plugin-monaco-editor-1.1.0.tgz"
+  "version" "1.1.0"
+
 "vite-plugin-vuetify@^1.0.0-alpha.12":
   "integrity" "sha512-lP4vG+Z3LnIEjI8nSE8/MJwDRQK5OnS2i4zHDu36yyD4E7wmPKyIkWJdkfBIsx/O+PU7dGc/3MeLARgr+RErEQ=="
   "resolved" "https://registry.npmjs.org/vite-plugin-vuetify/-/vite-plugin-vuetify-1.0.0-alpha.17.tgz"
@@ -6182,7 +6201,7 @@
     "@volar/vue-language-core" "0.40.13"
     "@volar/vue-typescript" "0.40.13"
 
-"vue@^2.6.0 || ^3.1.0", "vue@^2.6.14 || ^3.2.0", "vue@^3.0.0", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.0.1", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.2.38", "vue@3.2.40":
+"vue@^2.6.0 || ^3.1.0", "vue@^2.6.14 || ^3.2.0", "vue@^3.0.0", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.0.1", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.2.37", "vue@^3.2.38", "vue@3.2.40":
   "integrity" "sha512-1mGHulzUbl2Nk3pfvI5aXYYyJUs1nm4kyvuz38u4xlQkLUn1i2R7nDbI4TufECmY8v1qNBHYy62bCaM+3cHP2A=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-3.2.40.tgz"
   "version" "3.2.40"

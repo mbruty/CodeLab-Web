@@ -12,6 +12,19 @@ import {
 } from "@apollo/client/core";
 import { DefaultApolloClient } from "@vue/apollo-composable";
 
+// Monaco
+import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
+import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+
+self.MonacoEnvironment = {
+	getWorker(_: any, label: string) {
+		if (label === "typescript" || label === "javascript") {
+			return new tsWorker();
+		}
+		return new editorWorker();
+	},
+};
+
 import "./assets/main.css";
 
 loadFonts();
