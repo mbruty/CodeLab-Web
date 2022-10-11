@@ -1,58 +1,62 @@
 <template>
-	<div class="container">
-		<h2>
-			Welcome, you're only 1 step away from joining the best online coding
-			platform there is
-		</h2>
-		<v-form ref="form" v-model="valid" lazy-validation>
-			<v-text-field
-				id="name"
-				v-model="name"
-				:counter="10"
-				:rules="nameRules"
-				label="Nick name"
-				required
-			></v-text-field>
+	<div class="absolute-center">
+		<div class="container">
+			<h2>
+				Welcome, you're only 1 step away from joining the best online coding
+				platform there is
+			</h2>
+			<v-form ref="form" v-model="valid" lazy-validation>
+				<v-text-field
+					id="name"
+					v-model="name"
+					:counter="10"
+					:rules="nameRules"
+					label="Nick name"
+					required
+				></v-text-field>
 
-			<v-text-field
-				id="email"
-				v-model="email"
-				:rules="emailRules"
-				label="E-mail"
-				required
-			></v-text-field>
+				<v-text-field
+					id="email"
+					v-model="email"
+					:rules="emailRules"
+					label="E-mail"
+					required
+				></v-text-field>
 
-			<v-text-field
-				id="password"
-				v-model="password"
-				:rules="passwordRules"
-				label="Password"
-				type="password"
-				required
-			></v-text-field>
+				<v-text-field
+					id="password"
+					v-model="password"
+					:rules="passwordRules"
+					label="Password"
+					required
+					type="password"
+				></v-text-field>
 
-			<v-text-field
-				id="passwordConf"
-				v-model="passwordConf"
-				:rules="passwordConfRules"
-				label="Confirm Password"
-				type="password"
-				required
-			></v-text-field>
-			<div class="inline">
-				<p>Already have an account? <router-link to="login">log in</router-link></p>
-				<v-btn id="submit" :disabled="!valid" color="success" @click="submit">
-					Create Account
-				</v-btn>
-			</div>
-		</v-form>
+				<v-text-field
+					id="passwordConf"
+					v-model="passwordConf"
+					:rules="passwordConfRules"
+					label="Confirm Password"
+					required
+					type="password"
+				></v-text-field>
+				<div class="inline">
+					<p>Already have an account?
+						<router-link to="login">log in</router-link>
+					</p>
+					<v-btn id="submit" :disabled="!valid" color="success" @click="submit">
+						Create Account
+					</v-btn>
+				</div>
+			</v-form>
+		</div>
 	</div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import router from "@/router";
-import { useNavigationStore } from "@/stores/navigationStore";
-import { ref, watch } from "vue";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {ref} from "vue";
 
 const nav = useNavigationStore();
 nav.enabled = false;
@@ -113,6 +117,7 @@ button {
 	display: flex;
 	flex-direction: row;
 }
+
 @media only screen and (min-width: 800px) {
 	h2 {
 		max-width: 40%;
@@ -120,6 +125,7 @@ button {
 		margin-right: 1rem;
 		padding-right: 1rem;
 	}
+
 	.container {
 		padding: 2rem;
 		flex-direction: row;

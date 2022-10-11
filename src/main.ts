@@ -1,31 +1,26 @@
-import { createApp, provide, h } from "vue";
-import { createPinia } from "pinia";
+import {createApp, h, provide} from "vue";
+import {createPinia} from "pinia";
 
 import App from "./App.vue";
 import router from "./router";
 import vuetify from "./plugins/vuetify";
-import { loadFonts } from "./plugins/webfontloader";
-import {
-	ApolloClient,
-	createHttpLink,
-	InMemoryCache,
-} from "@apollo/client/core";
-import { DefaultApolloClient } from "@vue/apollo-composable";
+import {loadFonts} from "./plugins/webfontloader";
+import {ApolloClient, createHttpLink, InMemoryCache,} from "@apollo/client/core";
+import {DefaultApolloClient} from "@vue/apollo-composable";
 
 // Monaco
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import "./assets/main.css";
 
 self.MonacoEnvironment = {
-	getWorker(_: any, label: string) {
-		if (label === "typescript" || label === "javascript") {
+	getWorker(_, label) {
+		if (label === 'typescript' || label === 'javascript') {
 			return new tsWorker();
 		}
 		return new editorWorker();
 	},
 };
-
-import "./assets/main.css";
 
 loadFonts();
 

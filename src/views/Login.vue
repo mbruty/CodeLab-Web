@@ -1,44 +1,48 @@
 <template>
-	<div class="container">
-		<h2>Welcome back!</h2>
-		<v-form ref="form" v-model="valid" lazy-validation>
-			<v-text-field
-				id="email"
-				v-model="email"
-				:rules="emailRules"
-				label="E-mail"
-				required
-			></v-text-field>
+	<div class="absolute-center">
+		<div class="container">
+			<h2>Welcome back!</h2>
+			<v-form ref="form" v-model="valid" lazy-validation>
+				<v-text-field
+					id="email"
+					v-model="email"
+					:rules="emailRules"
+					label="E-mail"
+					required
+				></v-text-field>
 
-			<v-text-field
-				id="password"
-				v-model="password"
-				:rules="passwordRules"
-				label="Password"
-				type="password"
-				required
-			></v-text-field>
-			<div v-if="errorText" class="v-messages__message">{{ errorText }}</div>
-			<div class="inline">
-				<p>
-					Don't have an account? <router-link to="join">join us</router-link>
-				</p>
-				<v-btn id="submit" :disabled="!valid" color="success" @click="submit">
-					Login
-				</v-btn>
-			</div>
-		</v-form>
+				<v-text-field
+					id="password"
+					v-model="password"
+					:rules="passwordRules"
+					label="Password"
+					required
+					type="password"
+				></v-text-field>
+				<div v-if="errorText" class="v-messages__message">{{ errorText }}</div>
+				<div class="inline">
+					<p>
+						Don't have an account?
+						<router-link to="join">join us</router-link>
+					</p>
+					<v-btn id="submit" :disabled="!valid" color="success" @click="submit">
+						Login
+					</v-btn>
+				</div>
+			</v-form>
+		</div>
 	</div>
+
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import router from "@/router";
-import { useNavigationStore } from "@/stores/navigationStore";
-import { useUserStore } from "@/stores/userStore";
-import { ref } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useUserStore} from "@/stores/userStore";
+import {ref} from "vue";
+import {useMutation} from "@vue/apollo-composable";
 import gql from "graphql-tag";
-import type { User } from "@/gql/types/graphql";
+import type {User} from "@/gql/types/graphql";
 
 // GQL Mutation
 const {
@@ -52,7 +56,7 @@ const {
 			id
 			email
 			username
-			refreshCount
+			xp
 		}
 	}
 `);
@@ -122,6 +126,7 @@ button {
 		margin-right: 1rem;
 		padding-right: 1rem;
 	}
+
 	.container {
 		padding: 2rem;
 		flex-direction: row;

@@ -1,3 +1,17 @@
+<template>
+	<div v-if="userStore.isLoading" class="center">
+		<v-progress-circular :size="70" color="green" indeterminate/>
+		<p>Loading...</p>
+	</div>
+	<div v-else>
+		<header>
+			<NavBar/>
+		</header>
+		<div style="margin-left: 60px; width: calc(100vw - 60px); height: 100vh;">
+			<RouterView/>
+		</div>
+	</div>
+</template>
 <script lang="ts" setup>
 import {RouterView} from "vue-router";
 import NavBar from "./components/NavBar.vue";
@@ -21,9 +35,9 @@ const {result, error} = useQuery<{ me: User }>(gql`
 		}
 	}
 `);
+
 watch(result, () => {
 	userStore.isLoading = false;
-	console.log(result.value?.me);
 	userStore.user = result.value?.me;
 	navigationStore.enabled = true;
 });
@@ -33,22 +47,6 @@ watch(error, () => {
 	router.push("/join");
 });
 </script>
-
-<template>
-	<div v-if="userStore.isLoading" class="center">
-		<v-progress-circular :size="70" color="green" indeterminate/>
-		<p>Loading...</p>
-	</div>
-	<div v-else>
-		<header>
-			<NavBar/>
-		</header>
-		<div style="margin-left: 60px; width: calc(100vw - 60px); height: 100vh;">
-			<RouterView/>
-		</div>
-	</div>
-</template>
-
 <style scoped>
 
 .center {
