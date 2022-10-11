@@ -56,12 +56,12 @@ const navItems: Array<{ icon: string; title: string; url: string }> = [
 	{
 		icon: "mdi-view-dashboard",
 		title: "Home",
-		url: "dashboard",
+		url: "/dashboard",
 	},
 	{
 		icon: "mdi-logout",
 		title: "Log out",
-		url: "logout"
+		url: "/logout"
 	}
 ];
 
