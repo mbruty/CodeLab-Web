@@ -27,7 +27,7 @@ loadFonts();
 // Apollo
 const httpLink = createHttpLink({
 	// You should use an absolute URL here
-	uri: "http://localhost:8080/graphql",
+	uri: "http://gql.bruty.net/graphql",
 	credentials: "include",
 });
 const cache = new InMemoryCache();

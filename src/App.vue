@@ -1,31 +1,31 @@
 <template>
 	<div v-if="userStore.isLoading" class="center">
-		<v-progress-circular :size="70" color="green" indeterminate/>
+		<v-progress-circular :size="70" color="green" indeterminate />
 		<p>Loading...</p>
 	</div>
 	<div v-else>
 		<header>
-			<NavBar/>
+			<NavBar />
 		</header>
-		<div style="margin-left: 60px; width: calc(100vw - 60px); height: 100vh;">
-			<RouterView/>
+		<div style="margin-left: 60px; width: calc(100vw - 60px); height: 100vh">
+			<RouterView />
 		</div>
 	</div>
 </template>
 <script lang="ts" setup>
-import {RouterView} from "vue-router";
+import { RouterView } from "vue-router";
 import NavBar from "./components/NavBar.vue";
-import {useUserStore} from "./stores/userStore";
-import {useQuery} from "@vue/apollo-composable";
+import { useUserStore } from "./stores/userStore";
+import { useQuery } from "@vue/apollo-composable";
 import gql from "graphql-tag";
-import {watch} from "vue";
+import { watch } from "vue";
 import router from "./router";
-import {useNavigationStore} from "./stores/navigationStore";
-import {User} from "./gql/types/graphql";
+import { useNavigationStore } from "./stores/navigationStore";
+import type { User } from "./gql/types/graphql";
 
 const userStore = useUserStore();
 const navigationStore = useNavigationStore();
-const {result, error} = useQuery<{ me: User }>(gql`
+const { result, error } = useQuery<{ me: User }>(gql`
 	query AuthCheck {
 		me {
 			id
@@ -48,7 +48,6 @@ watch(error, () => {
 });
 </script>
 <style scoped>
-
 .center {
 	position: absolute;
 	left: 50%;
