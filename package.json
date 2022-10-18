@@ -1,60 +1,61 @@
 {
-  "name": "comp3000-web",
-  "version": "0.0.0",
-  "scripts": {
-    "serve": "vite preview --host",
-    "build": "vite build",
-    "test:unit": "vitest --environment jsdom",
-    "test:e2e": "start-server-and-test preview http://localhost:4173/ 'cypress open --e2e'",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "build-only": "vite build",
-    "dev": "vite",
-    "preview": "vite preview --port 4173",
-    "test:e2e:ci": "start-server-and-test preview http://localhost:4173/ 'cypress run --e2e'",
-    "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
-    "codegen": "graphql-codegen --config codegen.ts"
-  },
+  "name": "codelab-web",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "@apollo/client": "^3.6.10",
-    "@mdi/font": "5.9.55",
-    "@vue/apollo-composable": "^4.0.0-alpha.19",
+    "@apollo/client": "^3.7.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.66",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
     "graphql": "^16.6.0",
-    "graphql-tag": "^2.12.6",
-    "monaco-editor-vue3": "^0.1.6",
-    "pinia": "^2.0.21",
-    "roboto-fontface": "*",
-    "vue": "^3.2.38",
-    "vue-router": "^4.1.5",
-    "vuetify": "^3.0.0-beta.0",
-    "webfontloader": "^1.0.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.2",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.8.4",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "codegen": "graphql-codegen --config ./src/codegen.ts --watch"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "2.13.2",
-    "@graphql-codegen/client-preset": "1.0.2",
-    "@graphql-codegen/introspection": "2.2.1",
-    "@rushstack/eslint-patch": "^1.1.4",
-    "@types/jsdom": "^20.0.0",
-    "@types/node": "^16.11.56",
-    "@types/webfontloader": "^1.0.0",
-    "@vitejs/plugin-vue": "^3.0.3",
-    "@vitejs/plugin-vue-jsx": "^2.0.1",
-    "@vue/eslint-config-prettier": "^7.0.0",
-    "@vue/eslint-config-typescript": "^11.0.0",
-    "@vue/test-utils": "^2.0.2",
-    "@vue/tsconfig": "^0.1.3",
-    "cypress": "^10.7.0",
-    "eslint": "^8.22.0",
-    "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-vue": "^9.3.0",
-    "jsdom": "^20.0.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.7.1",
-    "start-server-and-test": "^1.14.0",
-    "typescript": "^4.8.4",
-    "vite": "^3.0.9",
-    "vite-plugin-vuetify": "^1.0.0-alpha.12",
-    "vitest": "^0.23.0",
-    "vue-cli-plugin-vuetify": "~2.5.8",
-    "vue-tsc": "^0.40.7"
+    "@graphql-codegen/cli": "^2.13.7",
+    "@graphql-codegen/client-preset": "^1.0.7",
+    "@typescript-eslint/eslint-plugin": "^5.40.1",
+    "@typescript-eslint/parser": "^5.40.1",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jest": "^27.1.2",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0"
   }
 }
