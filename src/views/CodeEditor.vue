@@ -8,13 +8,86 @@
 			<h1>{{ data.title }}</h1>
 		</div>
 		<div class="code-zone">
+			<div class="code-editor">
+				<div class="code-tool-bar">
+					<v-select
+						:item-value="selectedLanguage"
+						:items="languages"
+						:model-value="selectedLanguage"
+						label="Language"
+						return-object
+						variant="plain"
+						@update:modelValue="setSelection"
+					></v-select>
+					<SavingIndicator
+						:loading="saveLoading"
+						:unsavedProgress="unsavedProgress"
+						:error="!!saveError"
+					/>
+					<div style="margin: 0 0 0 auto" />
+					<v-btn prepend @click="reset">
+						<v-icon>mdi-refresh</v-icon>
+						Reset
+					</v-btn>
+					<v-btn
+						v-if="
+							!userHasChangedCode &&
+							evalResult != undefined &&
+							evalResult.evaluate.isSuccessful
+						"
+						color="success"
+					>
+						<v-progress-circular
+							v-if="evalLoading"
+							:size="20"
+							color="white"
+							indeterminate
+							style="margin-right: 5px"
+						/>
+						<v-icon v-else style="pargin-right: 5px">mdi-content-save</v-icon>
+						Submit solution
+					</v-btn>
+					<v-btn v-else color="success" @click="onRunCodeClick">
+						<v-progress-circular
+							v-if="evalLoading"
+							:size="20"
+							color="white"
+							indeterminate
+							style="margin-right: 5px"
+						/>
+						<v-icon v-else style="margin-right: 5px">mdi-play</v-icon>
+						Run Code
+					</v-btn>
+				</div>
+				<MonacoEditor
+					v-model:value="data.myCode"
+					:language="monacoLanguage"
+					:theme="theme"
+					height="50%"
+					@change="saveChanges"
+				></MonacoEditor>
+				<div class="container"></div>
+				<div class="code-tool-bar">
+					<h2>Test code</h2>
+				</div>
+				<v-divider />
+				<MonacoEditor
+					v-model:value="data.testCode"
+					:language="monacoLanguage"
+					:theme="theme"
+					height="31%"
+					@change="change"
+				></MonacoEditor>
+				<div class="container" />
+			</div>
+
 			<div class="code-zone--left">
 				<div class="container container--rounded container--description">
 					<h2>Task</h2>
 					<v-divider />
 					{{ data.description }}
 				</div>
-				<div class="container container--rounded container--output">
+				<div :class="outputClass">
 					<div style="display: flex">
 						<h2>Output</h2>
 						<div
@@ -31,58 +104,6 @@
 				</div>
 				<StatsContainer :data="evalResult?.evaluate" />
 			</div>
-			<div class="code-editor" style="margin-right: 1rem">
-				<div class="code-tool-bar">
-					<v-select
-						:item-value="selectedLanguage"
-						:items="languages"
-						:model-value="selectedLanguage"
-						label="Language"
-						return-object
-						variant="plain"
-						@update:modelValue="setSelection"
-					></v-select>
-					<div style="margin-right: 0; margin-left: auto" />
-					<v-btn prepend @click="reset">
-						<v-icon>mdi-refresh</v-icon>
-						Reset
-					</v-btn>
-					<v-btn v-if="true" color="success" @click="onRunCodeClick">
-						<v-progress-circular
-							v-if="evalLoading"
-							:size="20"
-							color="white"
-							indeterminate
-							style="margin-right: 5px"
-						/>
-						<v-icon v-else style="margin-right: 5px">mdi-play</v-icon>
-						Run Code
-					</v-btn>
-					<v-btn v-else prepend>
-						<v-icon>mdi-content-save</v-icon>
-						Save solution
-					</v-btn>
-				</div>
-				<MonacoEditor
-					v-model:value="data.starterCode"
-					:language="monacoLanguage"
-					:theme="theme"
-					height="50%"
-				></MonacoEditor>
-				<div class="container"></div>
-				<div class="code-tool-bar">
-					<h2>Test code</h2>
-				</div>
-				<v-divider />
-				<MonacoEditor
-					v-model:value="data.testCode"
-					:language="monacoLanguage"
-					:theme="theme"
-					height="31%"
-					@change="change"
-				></MonacoEditor>
-				<div class="container" />
-			</div>
 		</div>
 	</div>
 </template>
@@ -90,11 +111,16 @@
 <script lang="ts" setup>
 import { computed, reactive, ref, watch } from "vue";
 import MonacoEditor from "monaco-editor-vue3";
-import { useQuery } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import gql from "graphql-tag";
-import type { CodeResponse, ProgrammingTask, Stat } from "@/gql/types/graphql";
+import type {
+	CodeResponse,
+	ProgrammingTask,
+	MutationSubmitCodeArgs,
+} from "@/gql/types/graphql";
 import { useRoute } from "vue-router";
 import StatsContainer from "../components/code-editor/StatsContainer.vue";
+import SavingIndicator from "../components/code-editor/SavingIndicator.vue";
 
 let originalTestCode = "";
 let originalCode = "";
@@ -116,6 +142,8 @@ const evaluateOptions = ref({
 	enabled: false,
 });
 
+const unsavedProgress = ref(false);
+const userHasChangedCode = ref(false);
 const data = ref<ProgrammingTask>({
 	id: -1,
 	description: "",
@@ -123,6 +151,7 @@ const data = ref<ProgrammingTask>({
 	title: "",
 	testCode: "",
 	language: "",
+	myCode: "",
 	availableLanguages: [],
 });
 
@@ -131,6 +160,8 @@ const firstLoad = ref(true);
 const languages = ref(["loading..."]);
 
 const selectedLanguage = ref("default");
+
+const outputClass = ref("container container--rounded container--output");
 //endregion
 
 // region Graphql
@@ -140,12 +171,14 @@ const { result, error, loading } = useQuery<{
 	gql`
 		query GetCode($id: Int!, $language: String!) {
 			programmingTask(taskId: $id, language: $language) {
+				id
 				title
 				description
 				starterCode
 				testCode
 				language
 				availableLanguages
+				myCode
 			}
 		}
 	`,
@@ -173,6 +206,18 @@ const {
 	`,
 	evaluateProps,
 	evaluateOptions
+);
+
+const {
+	mutate: saveCode,
+	loading: saveLoading,
+	error: saveError,
+} = useMutation<boolean, MutationSubmitCodeArgs>(
+	gql`
+		mutation SaveCode($submission: UserCodeSubmissionInput) {
+			submitCode(submission: $submission)
+		}
+	`
 );
 // endregion
 
@@ -206,27 +251,43 @@ const outputText = computed(() => {
 	return evalResult.value?.evaluate.output;
 });
 
-let timeout: number | undefined;
-
-watch(data, () => {
-	clearTimeout(timeout);
-});
-
 watch(result, () => {
-	if (props.language == "default") {
-		// If we're getting the default language for the task, update the drop-down's value
-	}
 	originalTestCode = result.value?.programmingTask.testCode ?? "";
-	originalCode = result.value?.programmingTask.starterCode ?? "";
 	data.value = result.value?.programmingTask;
-	languages.value = result.value?.programmingTask.availableLanguages ?? ";";
-	selectedLanguage.value = result.value?.programmingTask.language;
+	languages.value = result.value?.programmingTask?.availableLanguages ?? [""];
+	selectedLanguage.value = result.value?.programmingTask.language ?? "";
+
+	if (!result?.value?.programmingTask.myCode) {
+		data.value.myCode = result?.value?.programmingTask.starterCode;
+	}
 });
+
+// watch([evalResult, unsavedProgress], () => {
+// 	console.log(
+// 		evalResult.value.evaluate.isSuccessful && unsavedProgress
+// 	);
+// });
 
 watch(loading, () => {
 	if (!loading.value) {
 		firstLoad.value = false;
 	}
+});
+
+let outputClassTimeout: number | undefined;
+
+watch(evalResult, () => {
+	userHasChangedCode.value = false;
+	const defualtClass = "container container--rounded container--output output";
+	if (evalResult.value?.evaluate.isSuccessful) {
+		outputClass.value = defualtClass + " output--success";
+	} else {
+		outputClass.value = defualtClass + " output--failure";
+	}
+	clearTimeout(outputClassTimeout);
+	outputClassTimeout = setTimeout(() => {
+		outputClass.value = defualtClass;
+	}, 500);
 });
 
 // endregion
@@ -245,11 +306,41 @@ function change() {
 	data.testCode = originalTestCode;
 }
 
+let saveTimeout: number | undefined;
+
+function saveChanges() {
+	clearTimeout(saveTimeout);
+	unsavedProgress.value = true;
+	userHasChangedCode.value = true;
+	// Save the code after 1s of not typing
+	saveTimeout = setTimeout(() => {
+		saveCode({
+			submission: {
+				codeText: data.value.myCode ?? data.value.starterCode,
+				language: data.value.language,
+				taskId: data.value.id,
+			},
+		});
+		unsavedProgress.value = false;
+	}, 1000);
+}
+
 function onRunCodeClick() {
 	evaluateProps.language = data.value.language;
-	evaluateProps.code = data.value.starterCode;
+	evaluateProps.code = data.value.myCode ?? "";
 	evaluateOptions.value.enabled = true;
 	evaluateCode(evaluateProps);
+}
+
+function onSubmitClicked() {
+	saveCode({
+		submission: {
+			codeText: data.value.myCode!!,
+			language: data.value.language,
+			taskId: data.value.id,
+			isSubmitted: true
+		}
+	})
 }
 
 function reset() {
@@ -283,7 +374,8 @@ function reset() {
 	width: calc(100vw - 60px);
 	height: calc(100vh - 60px);
 	display: grid;
-	grid-template-columns: 40% 60%;
+	grid-template-columns: 60% 40%;
+	margin-left: 1em;
 }
 
 .code-editor {
@@ -325,8 +417,20 @@ function reset() {
 .code-zone--left {
 	display: flex;
 	flex-direction: column;
+	margin-right: 1rem;
 }
 
+.output {
+	transition: background-color 0.5s ease;
+}
+
+.output--success {
+	background-color: green;
+}
+
+.output--failure {
+	background-color: red;
+}
 button {
 	margin-right: 0.5rem;
 }
