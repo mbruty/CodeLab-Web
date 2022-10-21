@@ -1,19 +1,15 @@
-import type { CodegenConfig } from '@graphql-codegen/cli';
+import { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-    overwrite: true,
-    schema: "src/gql/schema.json",
-    documents: "src/**/*.tsx",
+    schema: 'http://gql.bruty.net/graphql',
+    documents: ['src/**/*.tsx'],
+    ignoreNoDocuments: true, // for better experience with the watcher
     generates: {
-        "src/gql/schema.json": {
-            plugins: ["introspection"],
-            schema: "http://localhost:8080/graphql"
-        },
-        "src/gql/types": {
-            preset: "client",
+        './src/gql/': {
+            preset: 'client',
             plugins: []
-        },
+        }
     }
-};
+}
 
-export default config;
+export default config

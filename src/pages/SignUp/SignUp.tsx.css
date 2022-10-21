@@ -1,0 +1,8 @@
+.login-input {
+  margin-top: 1rem !important;
+}
+
+.form-error {
+  color: red;
+  font-size: small;
+}
