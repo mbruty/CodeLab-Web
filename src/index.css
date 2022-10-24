@@ -16,5 +16,5 @@ code {
     margin-left: 200px;
     margin-top: 84px;
     width: calc( 100vw - 200px);
-    min-height: calc( 100vh - 84px);
+    height: calc( 100vh - 84px);
 }

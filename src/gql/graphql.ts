@@ -288,17 +288,16 @@ export type MutationSignUpArgs = {
 
 
 export type MutationSubmitCodeArgs = {
-  codeText: Scalars['String'];
-  isWorkInProgress: Scalars['Boolean'];
+  submission?: InputMaybe<UserCodeSubmissionInput>;
 };
 
 export type ProgrammingTask = {
   __typename?: 'ProgrammingTask';
-  availableLanguages?: Maybe<Array<Maybe<Scalars['String']>>>;
+  availableLanguages: Array<Maybe<Scalars['String']>>;
   description: Scalars['String'];
-  id: Scalars['Int'];
+  id: Scalars['ID'];
   language: Scalars['String'];
-  myCode?: Maybe<Scalars['String']>;
+  myCode: Scalars['String'];
   starterCode: Scalars['String'];
   testCode: Scalars['String'];
   title: Scalars['String'];
@@ -382,7 +381,22 @@ export type GetCodeQueryVariables = Exact<{
 }>;
 
 
-export type GetCodeQuery = { __typename?: 'Query', programmingTask: { __typename?: 'ProgrammingTask', id: number, title: string, description: string, starterCode: string, testCode: string, language: string, availableLanguages?: Array<string | null> | null, myCode?: string | null } };
+export type GetCodeQuery = { __typename?: 'Query', programmingTask: { __typename?: 'ProgrammingTask', id: string, title: string, description: string, starterCode: string, testCode: string, language: string, availableLanguages: Array<string | null>, myCode: string } };
+
+export type EvaluateQueryVariables = Exact<{
+  code: Scalars['String'];
+  language: Scalars['String'];
+}>;
+
+
+export type EvaluateQuery = { __typename?: 'Query', evaluate: { __typename?: 'CodeResponse', output?: string | null, errorText?: string | null, isSuccessful: boolean, executionTimeMS: any, stats: Array<{ __typename?: 'Stat', mem: string, cpu: string } | null> } };
+
+export type SaveCodeMutationVariables = Exact<{
+  submission?: InputMaybe<UserCodeSubmissionInput>;
+}>;
+
+
+export type SaveCodeMutation = { __typename?: 'Mutation', submitCode?: boolean | null };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
@@ -395,4 +409,6 @@ export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'U
 
 export const GetLoggedInUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetLoggedInUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"xp"}}]}}]}}]} as unknown as DocumentNode<GetLoggedInUserQuery, GetLoggedInUserQueryVariables>;
 export const GetCodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"language"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"programmingTask"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"taskId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"language"},"value":{"kind":"Variable","name":{"kind":"Name","value":"language"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"starterCode"}},{"kind":"Field","name":{"kind":"Name","value":"testCode"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"availableLanguages"}},{"kind":"Field","name":{"kind":"Name","value":"myCode"}}]}}]}}]} as unknown as DocumentNode<GetCodeQuery, GetCodeQueryVariables>;
+export const EvaluateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Evaluate"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"code"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"language"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"evaluate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"code"},"value":{"kind":"Variable","name":{"kind":"Name","value":"code"}}},{"kind":"Argument","name":{"kind":"Name","value":"language"},"value":{"kind":"Variable","name":{"kind":"Name","value":"language"}}},{"kind":"Argument","name":{"kind":"Name","value":"taskId"},"value":{"kind":"IntValue","value":"1"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"output"}},{"kind":"Field","name":{"kind":"Name","value":"stats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mem"}},{"kind":"Field","name":{"kind":"Name","value":"cpu"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errorText"}},{"kind":"Field","name":{"kind":"Name","value":"isSuccessful"}},{"kind":"Field","name":{"kind":"Name","value":"executionTimeMS"}}]}}]}}]} as unknown as DocumentNode<EvaluateQuery, EvaluateQueryVariables>;
+export const SaveCodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SaveCode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"submission"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserCodeSubmissionInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"submitCode"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"submission"},"value":{"kind":"Variable","name":{"kind":"Name","value":"submission"}}}]}]}}]} as unknown as DocumentNode<SaveCodeMutation, SaveCodeMutationVariables>;
 export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"xp"}}]}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
