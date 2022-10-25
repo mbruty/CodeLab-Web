@@ -123,16 +123,38 @@ const LoginForm: React.FC = () => {
           <p className="form-error">{loginError.password}</p>
         )}
         {loginError.login && <p className="form-error">{loginError.login}</p>}
-        <Button
-          style={{ margin: "1rem 0 0 auto" }}
-          variant="outlined"
-          type="submit"
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
         >
-          {loading && (
-            <CircularProgress size="15px" style={{ marginRight: "0.5rem" }} />
-          )}
-          Login
-        </Button>
+          <Button
+            style={{ margin: "1rem 0 0 auto" }}
+            variant="outlined"
+            onClick={() => {
+              mutateFunction({
+                variables: {
+                  email: "demo@gmail.com",
+                  password: "password123",
+                },
+              });
+            }}
+          >
+            Login as demo
+          </Button>
+          <Button
+            style={{ margin: "1rem 0 0 1rem" }}
+            variant="outlined"
+            type="submit"
+          >
+            {loading && (
+              <CircularProgress size="15px" style={{ marginRight: "0.5rem" }} />
+            )}
+            Login
+          </Button>
+        </div>
       </FormControl>
     </form>
   );

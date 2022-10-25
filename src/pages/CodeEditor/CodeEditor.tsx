@@ -238,6 +238,7 @@ const CodeEditor: React.FC = () => {
   const [timeout, updateTimeout] = React.useState<number | undefined>();
   const [saveState, setSaveState] = React.useState(SaveState.SAVED);
   const [canSubmit, setCanSubmit] = React.useState(false);
+  const [skipChange, setSkipChange] = React.useState(false);
   // Ensure that we have a task id
   const taskId = parseInt(params.taskid ?? "-1");
   if (taskId === -1) {
@@ -317,21 +318,25 @@ const CodeEditor: React.FC = () => {
 
   function onCodeUpdated(code: string) {
     // If they could previously submit, but they've changed some code, disable it again
+    if(skipChange) {
+      setSkipChange(false);
+    }
     if (canSubmit) {
       setCanSubmit(false);
     }
     setTask((previous) => {
       return { ...previous, myCode: code } as ProgrammingTask;
     });
-    setSaveState(SaveState.UNSAVED);
     clearTimeout(timeout);
+    setSaveState(SaveState.UNSAVED);
+
     const t1 = setTimeout(() => {
       save({
         variables: {
           submission: {
-            codeText: task?.myCode!,
+            codeText: code,
             taskId,
-            language: task?.language!,
+            language: selectedLanguage,
           },
         },
       });
@@ -347,6 +352,7 @@ const CodeEditor: React.FC = () => {
             avalibleLanguages={task.availableLanguages as string[]} // CodeGen isn't seeing that this isn't an optional
             language={selectedLanguage}
             handleChange={(x) => {
+              setSkipChange(true);
               setSelectedLanguage(x);
             }}
             handleReset={() => {
