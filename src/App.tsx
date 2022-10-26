@@ -45,7 +45,7 @@ function App() {
       onUpdate: (u) => {},
       onAuthFail: () => {
         setUnauthorisedError(true);
-        navigate("/sign-up");
+        navigate("/log-in");
       },
       guid: null,
     });
