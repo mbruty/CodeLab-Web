@@ -133,6 +133,7 @@ const LoginForm: React.FC = () => {
           <Button
             style={{ margin: "1rem 0 0 auto" }}
             variant="outlined"
+            id="login-as-demo"
             onClick={() => {
               mutateFunction({
                 variables: {

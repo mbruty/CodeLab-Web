@@ -30,9 +30,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "serve": "node serve.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "e2e": "npm run build && start-server-and-test serve http://localhost:3000 cy:run",
+    "cy:run": "cypress open",
     "codegen": "graphql-codegen --config ./src/codegen.ts --watch"
   },
   "eslintConfig": {
@@ -57,11 +60,14 @@
     "@graphql-codegen/cli": "^2.13.7",
     "@graphql-codegen/client-preset": "^1.0.7",
     "@graphql-codegen/introspection": "^2.2.1",
+    "@testing-library/cypress": "^8.0.3",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
+    "cypress": "^10.11.0",
     "eslint": "^8.2.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-jest": "^27.1.2",
     "eslint-plugin-jsx-a11y": "^6.5.1",

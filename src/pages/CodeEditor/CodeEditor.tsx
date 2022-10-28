@@ -100,13 +100,19 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
           value={props.language}
         >
           {props.avalibleLanguages.map((language) => (
-            <MenuItem value={language}>{language}</MenuItem>
+            <MenuItem
+              id={`language-select-${language.replace("#", "sharp")}`}
+              value={language}
+            >
+              {language}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
       <Indicator saveState={props.saveState} />
       <div style={{ margin: "auto 0 auto auto" }}>
         <Button
+          id="reset-solution"
           style={{ marginRight: "1rem" }}
           color="secondary"
           startIcon={<RefreshIcon />}
@@ -130,6 +136,7 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
         )}
         {!props.canSubmit && (
           <LoadingButton
+            id="run-code"
             style={{ marginRight: "1rem" }}
             loading={props.runCodeIsLoading}
             loadingPosition="start"
@@ -301,7 +308,18 @@ const CodeEditor: React.FC = () => {
   }, [saveLoading]);
 
   if (task === null) {
-    return <CircularProgress />;
+    return (
+      <div
+        style={{
+          display: "grid",
+          placeItems: "center",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <CircularProgress id="spinner" />
+      </div>
+    );
   }
 
   function evaluateCode() {
@@ -318,7 +336,7 @@ const CodeEditor: React.FC = () => {
 
   function onCodeUpdated(code: string) {
     // If they could previously submit, but they've changed some code, disable it again
-    if(skipChange) {
+    if (skipChange) {
       setSkipChange(false);
     }
     if (canSubmit) {
