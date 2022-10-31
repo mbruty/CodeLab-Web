@@ -10,7 +10,7 @@ import UserObserver from "./contexts/UserObserver";
 import { gql, useQuery } from "@apollo/client";
 import { unauthorisedCheck } from "./gql/exceptionChecks";
 import Snackbar from "@mui/material/Snackbar";
-import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import MuiAlert from "@mui/material/Alert";
 
 const getLoggedInUser = gql`
   query GetLoggedInUser {
@@ -33,11 +33,7 @@ function App() {
   const [observer] = React.useState(new UserObserver());
   const [unauthorisedError, setUnauthorisedError] = React.useState(false);
   // Get the current logged in user
-  const {
-    loading: userLoading,
-    error: userError,
-    data: userData,
-  } = useQuery(getLoggedInUser);
+  const { loading: userLoading, error: userError } = useQuery(getLoggedInUser);
 
   // Subscribe to the observer on the first render
   React.useEffect(() => {
@@ -57,7 +53,7 @@ function App() {
 
   React.useEffect(() => {
     unauthorisedCheck(userError, observer);
-  }, [userError]);
+  }, [userError, observer]);
 
   if (userLoading) {
     return <p>Loading</p>;
