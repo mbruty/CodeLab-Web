@@ -19,11 +19,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Install dependencies
+        run: npm ci
       - name: Run tests
         run: npm run e2e:ci
 
   container:
     name: Build Container
+    needs: test
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
