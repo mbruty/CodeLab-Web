@@ -1,22 +1,9 @@
 import { API_URL } from "../../src/config";
 
 describe("Code editor", () => {
-  before(() => {
-    Cypress.Cookies.debug(true);
-  });
   beforeEach(() => {
-    Cypress.Cookies.preserveOnce("access_token", "refresh_token");
+    cy.login(API_URL);
     cy.visit("/code/1");
-  });
-  it("Redirects to login with no authentication cookies", () => {
-    cy.clearCookie("access_token");
-    cy.clearCookie("refresh_token");
-    cy.visit("/code/1");
-    cy.location("pathname").should("eq", "/log-in");
-    cy.intercept("POST", API_URL).as("graphql");
-    cy.get("#login-as-demo").click();
-    cy.wait("@graphql");
-    cy.location("pathname").should("eq", "/");
   });
 
   it("Shows loading spinner", () => {
@@ -57,7 +44,7 @@ describe("Code editor", () => {
     cy.intercept("POST", API_URL).as("graphql");
     cy.wait("@graphql"); // Auth Check
     cy.wait("@graphql"); // Get task
-    cy.get(".view-line").eq(1).type("{end}{leftArrow} * 2");
+    cy.get(".mtk9").eq(3).type("{end}{leftArrow} * 2");
     cy.wait("@graphql"); // Save Solution
 
     // Reset solution
@@ -85,7 +72,7 @@ describe("Code editor", () => {
     cy.intercept("POST", API_URL).as("graphql");
     cy.wait("@graphql"); // Auth Check
     cy.wait("@graphql"); // Get task
-    cy.get(".view-line").eq(1).type("{end}{leftArrow} * 2");
+    cy.get(".mtk9").eq(3).type("{end}{leftArrow} * 2");
     cy.wait("@graphql"); // Save Solution
     cy.get("#run-code").click();
     cy.wait("@graphql"); // Execute
