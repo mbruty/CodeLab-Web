@@ -40,50 +40,6 @@ describe("Code editor", () => {
     }); // Get updated task
   });
 
-  it("Resets code", () => {
-    cy.intercept("POST", API_URL).as("graphql");
-    cy.wait("@graphql"); // Auth Check
-    cy.wait("@graphql"); // Get task
-    cy.get(".mtk9").eq(3).type("{end}{leftArrow} * 2");
-    cy.wait("@graphql"); // Save Solution
-
-    // Reset solution
-    cy.get("#reset-solution").click();
-    cy.wait("@graphql"); // Save
-
-    cy.get(".view-line").eq(0).contains("return");
-    cy.get(".view-line").eq(0).contains("args");
-    cy.get(".view-line").eq(0).contains(";");
-    cy.get(".view-line").eq(0).contains("*").should("not.exist");
-    cy.get(".view-line").eq(0).contains("2").should("not.exist");
-  });
-
-  it("Executes code failure", () => {
-    cy.intercept("POST", API_URL).as("graphql");
-    cy.wait("@graphql"); // Auth Check
-    cy.wait("@graphql"); // Get task
-    cy.get("#run-code").click();
-    cy.wait("@graphql"); // Execute
-    cy.get(".output--failure").should("be.visible");
-    cy.get(".output--success").should("not.exist");
-  });
-
-  it("Executes code success", () => {
-    cy.intercept("POST", API_URL).as("graphql");
-    cy.wait("@graphql"); // Auth Check
-    cy.wait("@graphql"); // Get task
-    cy.get(".mtk9").eq(3).type("{end}{leftArrow} * 2");
-    cy.wait("@graphql"); // Save Solution
-    cy.get("#run-code").click();
-    cy.wait("@graphql"); // Execute
-    cy.get(".output--failure").should("not.exist");
-    cy.get(".output--success").should("be.visible");
-
-    // Reset solution
-    cy.get("#reset-solution").click();
-    cy.wait("@graphql"); // Save
-  });
-
   it("Displays stats", () => {
     cy.intercept("POST", API_URL).as("graphql");
     cy.wait("@graphql"); // Auth Check
