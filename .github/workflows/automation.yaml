@@ -10,25 +10,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Run tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: npm ci
-      - name: Ensure prod url
-        run: echo "export const API_URL = \"http://gql.bruty.net/graphql\";" > ./src/config.ts
-      - name: Run tests
-        run: npm run e2e:ci
+#   test:
+#     name: Run tests
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: 18
+#       - name: Install dependencies
+#         run: npm ci
+#       - name: Ensure prod url
+#         run: echo "export const API_URL = \"http://gql.bruty.net/graphql\";" > ./src/config.ts
+#       - name: Run tests
+#         run: npm run e2e:ci
 
   container:
     name: Build Container
-    needs: test
+#     needs: test
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
