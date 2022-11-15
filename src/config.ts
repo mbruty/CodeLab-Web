@@ -1,0 +1,1 @@
+export const API_URL = "https://gql.bruty.net/graphql"

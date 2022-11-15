@@ -262,7 +262,7 @@ const CodeEditor: React.FC = () => {
 
   const [
     evaluate,
-    { data: evaluateData, error: evaluateError, loading: evaluateLoading },
+    { data: evaluateData, loading: evaluateLoading },
   ] = useLazyQuery(evaluateQuery, { fetchPolicy: "no-cache" });
 
   const [save, { loading: saveLoading }] = useMutation(saveCode);
@@ -293,7 +293,7 @@ const CodeEditor: React.FC = () => {
       }
       setTask(getCodeData.programmingTask);
     }
-  }, [getCodeData]);
+  }, [getCodeData]); // eslint-disable-line
 
   React.useEffect(() => {
     unauthorisedCheck(getCodeError, userObserver);

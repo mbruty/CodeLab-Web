@@ -149,6 +149,7 @@ const LoginForm: React.FC = () => {
             style={{ margin: "1rem 0 0 1rem" }}
             variant="outlined"
             type="submit"
+            id="submit"
           >
             {loading && (
               <CircularProgress size="15px" style={{ marginRight: "0.5rem" }} />

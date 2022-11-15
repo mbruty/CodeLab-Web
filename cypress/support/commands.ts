@@ -25,13 +25,24 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+declare namespace Cypress {
+  interface Chainable {
+    login(apiUrl: string, email?: string, password?: string): Chainable;
+  }
+}
+
+Cypress.Commands.add(
+  "login",
+  (apiUrl, email = "ci@bruty.net", password = "ci123!") => {
+    function login() {
+      cy.intercept("POST", apiUrl).as("graphql");
+      cy.visit("/log-in");
+      cy.get("#email").type(email);
+      cy.get("#password").type(password);
+      cy.get("#submit").click();
+      cy.location("pathname").should("eq", "/");
+    }
+    cy.session([email, password], login)
+  }
+);

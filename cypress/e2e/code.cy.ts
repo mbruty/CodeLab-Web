@@ -1,28 +1,18 @@
+import { API_URL } from "../../src/config";
+
 describe("Code editor", () => {
-  before(() => {
-    Cypress.Cookies.debug(true);
-  });
   beforeEach(() => {
-    Cypress.Cookies.preserveOnce("access_token", "refresh_token");
+    cy.login(API_URL);
     cy.visit("/code/1");
-  });
-  it("Redirects to login with no authentication cookies", () => {
-    cy.clearCookies();
-    cy.visit("/code/1");
-    cy.location("pathname").should("eq", "/log-in");
-    cy.intercept("POST", "http://localhost:8080/graphql").as("graphql");
-    cy.get("#login-as-demo").click();
-    cy.wait("@graphql");
-    cy.location("pathname").should("eq", "/");
   });
 
   it("Shows loading spinner", () => {
-    cy.intercept("POST", "http://localhost:8080/graphql").as("graphql");
+    cy.intercept("POST", API_URL).as("graphql");
     cy.get("#spinner").should("be.visible");
   });
 
   it("Shows correct languages", () => {
-    cy.intercept("POST", "http://localhost:8080/graphql").as("graphql");
+    cy.intercept("POST", API_URL).as("graphql");
     cy.wait("@graphql"); // Auth Check
     cy.wait("@graphql"); // Get task
     cy.wait("@graphql"); // Get task
@@ -34,7 +24,7 @@ describe("Code editor", () => {
   });
 
   it("Loads new content when changing language", () => {
-    cy.intercept("POST", "http://localhost:8080/graphql").as("graphql");
+    cy.intercept("POST", API_URL).as("graphql");
     cy.wait("@graphql"); // Auth Check
     cy.wait("@graphql"); // Get task
     cy.get("#language-select").click();
@@ -50,34 +40,8 @@ describe("Code editor", () => {
     }); // Get updated task
   });
 
-  it("Executes code failure", () => {
-    cy.intercept("POST", "http://localhost:8080/graphql").as("graphql");
-    cy.wait("@graphql"); // Auth Check
-    cy.wait("@graphql"); // Get task
-    cy.get("#run-code").click();
-    cy.wait("@graphql"); // Execute
-    cy.get(".output--failure").should("be.visible");
-    cy.get(".output--success").should("not.exist");
-  });
-
-  it("Executes code success", () => {
-    cy.intercept("POST", "http://localhost:8080/graphql").as("graphql");
-    cy.wait("@graphql"); // Auth Check
-    cy.wait("@graphql"); // Get task
-    cy.get(".view-line").eq(1).type("{end}{leftArrow} * 2");
-    cy.wait("@graphql"); // Save Solution
-    cy.get("#run-code").click();
-    cy.wait("@graphql"); // Execute
-    cy.get(".output--failure").should("not.exist");
-    cy.get(".output--success").should("be.visible");
-
-    // Reset solution
-    cy.get("#reset-solution").click();
-    cy.wait("@graphql"); // Save
-  });
-
   it("Displays stats", () => {
-    cy.intercept("POST", "http://localhost:8080/graphql").as("graphql");
+    cy.intercept("POST", API_URL).as("graphql");
     cy.wait("@graphql"); // Auth Check
     cy.wait("@graphql"); // Get task
     cy.get("#run-code").click();
