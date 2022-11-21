@@ -59,7 +59,7 @@
 .code-zone--right {
   display: flex;
   flex-direction: column;
-  margin: 0 1rem 0.9rem 1rem;
+  margin-left: 1rem;
   justify-content: space-between;
 }
 

@@ -1,7 +1,7 @@
 import type {SvgIconComponent} from "@mui/icons-material";
 import React from "react";
 import CodeEditor from "./CodeEditor/CodeEditor";
-import Modules from "./Modules";
+import Courses from "./Courses";
 import SchoolIcon from '@mui/icons-material/School';
 import SignUp from "./SignUp/SignUp";
 interface INavItem {
@@ -35,7 +35,7 @@ const pages: Array<INavItem> = [
         icon: undefined
     },
     {
-        component: Modules,
+        component: Courses,
         path: "/courses",
         text: "Courses",
         isVisibleInNav: true,
