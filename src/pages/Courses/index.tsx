@@ -1,10 +1,20 @@
 import React from "react";
-import Paper from "@mui/material/Paper";
 import "./index.tsx.css";
 import { Doughnut } from "react-chartjs-2";
-import { Chart, ArcElement } from "chart.js";
-import { Divider } from "@mui/material";
-Chart.register(ArcElement);
+import { Link } from "react-router-dom";
+import { graphql } from "../../gql";
+import { useQuery } from "@apollo/client";
+import { Card, Spinner,Divider } from "@chakra-ui/react";
+
+const myModules = graphql(`
+  query myModules {
+    myModules {
+      id
+      title
+      completedPct
+    }
+  }
+`);
 
 const chartColors = [
   "#fd7f6f",
@@ -30,30 +40,26 @@ const data = {
   labels: ["COMP2001", "COMP2000", "COMP2003", "BPIE231"],
 };
 
-const modules = [
-  {
-    name: "COMP2000",
-    completedPct: 82,
-  },
-  {
-    name: "COMP2001",
-    completedPct: 21,
-  },
-  {
-    name: "COMP2002",
-    completedPct: 46,
-  },
-  {
-    name: "COMP2003",
-    completedPct: 0,
-  },
-  {
-    name: "COMP2005",
-    completedPct: 29,
-  },
-];
-
 const Courses: React.FC = () => {
+  const { data: modules, error, loading } = useQuery(myModules);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "grid",
+          placeItems: "center",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <Spinner id="spinner" />
+      </div>
+    );
+  }
+
+  console.log(modules);
+  
   return (
     <div className="courses-page">
       <div style={{ paddingRight: "1rem" }}>
@@ -82,11 +88,11 @@ const Courses: React.FC = () => {
             <Divider style={{ marginTop: "1rem" }} />
             <h2>Enroled Modules</h2>
             <div className="col-2">
-              {modules.map((item, idx) => (
+              {modules && modules.myModules.map((item, idx) => (
                 <div className="module-card">
-                  <a href="/">
-                    <h3>{item.name}</h3>
-                  </a>
+                  <Link to={`/module/${item?.id}`}>
+                    <h3>{item?.title}</h3>
+                  </Link>
                   <div style={{ position: "relative" }}>
                     <Doughnut
                       height={74}
@@ -94,7 +100,7 @@ const Courses: React.FC = () => {
                       data={{
                         datasets: [
                           {
-                            data: [item.completedPct, 100 - item.completedPct],
+                            data: [item?.completedPct, 100 - (item?.completedPct ?? 0)],
                             backgroundColor: moduleChartColors,
                           },
                         ],
@@ -105,7 +111,7 @@ const Courses: React.FC = () => {
                       }}
                     />
                     <div className="module--complete-pct">
-                      {item.completedPct}%
+                      {item?.completedPct}%
                     </div>
                   </div>
                 </div>
@@ -114,10 +120,10 @@ const Courses: React.FC = () => {
           </div>
         </div>
       </div>
-      <Paper elevation={0} style={{ padding: "0 1rem", overflow: "scroll" }}>
+      <Card style={{ padding: "0 1rem", overflow: "scroll" }}>
         <h2>Recently Accessed Courses</h2>
         <Divider />
-        {modules.map((item) => (
+        {/* {modules.map((item) => (
           <>
             <h3>{item.name}</h3>
             <p>
@@ -125,11 +131,11 @@ const Courses: React.FC = () => {
               libero.
             </p>
           </>
-        ))}
+        ))} */}
         <Divider />
         <h2>Popular Free Courses</h2>
         <Divider />
-        {modules.map((item) => (
+        {/* {modules.map((item) => (
           <>
             <h3>{item.name}</h3>
             <p>
@@ -137,8 +143,8 @@ const Courses: React.FC = () => {
               libero.
             </p>
           </>
-        ))}
-      </Paper>
+        ))} */}
+      </Card>
     </div>
   );
 };

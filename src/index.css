@@ -13,13 +13,42 @@ code {
 }
 
 .content {
-  margin-left: 200px;
-  margin-top: 85px;
-  width: calc(100vw - 220px);
-  height: calc(100vh - 105px);
+  margin: 1rem;
+  width: 100vw;
+  height: 100vh;
 }
 
 .col-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+
+.App {
+  background-color: var(--chakra-colors-gray-200);
+}
+
+
+.floatingLabel {
+  top: 12px;
+  left: 5px;
+  min-width: 100px;
+  padding-left: 10px;
+  z-index: 2;
+  position: absolute;
+  background-color: white;
+  pointer-events: none;
+  margin: 2 3;
+  padding: 0 2;
+  transform-origin: left top;
+  transform: scale(0.6) translateY(-30px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .App {
+    background-color: var(--chakra-colors-gray-900);
+  }
+
+  .floatingLabel {
+    background-color: var(--chakra-colors-gray-700);
+  }
 }

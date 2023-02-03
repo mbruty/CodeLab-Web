@@ -1,32 +1,41 @@
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import CircularProgress from "@mui/material/CircularProgress";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Monaco from "../../components/Monaco";
 import { graphql } from "../../gql";
 import "./CodeEditor.tsx.css";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
 import { CodeResponse, ProgrammingTask, Stat } from "../../gql/graphql";
 import { unauthorisedCheck } from "../../gql/exceptionChecks";
 import UserContext from "../../contexts/UserContext";
-import Divider from "@mui/material/Divider";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import LoadingButton from "@mui/lab/LoadingButton";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import ErrorIcon from "@mui/icons-material/Error";
-import CloudSyncIcon from "@mui/icons-material/CloudSync";
-import SaveIcon from "@mui/icons-material/Save";
-import SaveAltIcon from "@mui/icons-material/SaveAlt";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  Button,
+  Card,
+  CardHeader,
+  Divider,
+  FormControl,
+  FormLabel,
+  HStack,
+  Select,
+  Spinner,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
+import {
+  faFloppyDisk,
+  faPlay,
+  faCloud,
+  faArrowsRotate,
+  faCloudUpload,
+  faExclamation,
+  faCloudBolt,
+} from "@fortawesome/free-solid-svg-icons";
 
 enum SaveState {
   SAVING,
@@ -39,32 +48,32 @@ const Indicator: React.FC<{ saveState: SaveState }> = (props) => {
     case SaveState.UNSAVED:
       return (
         <div className="inline">
-          <ErrorIcon style={{ margin: "auto" }} />
-          <p className="info">You have unsaved changes</p>
+          <FontAwesomeIcon style={{ margin: "auto" }} icon={faCloudBolt} />
+          <Text className="info">You have unsaved changes</Text>
         </div>
       );
 
     case SaveState.SAVING:
       return (
         <div className="inline">
-          <CloudSyncIcon style={{ margin: "auto" }} />
-          <p className="info">Saving changes...</p>
+          <FontAwesomeIcon icon={faCloudUpload} style={{ margin: "auto" }} />
+          <Text className="info">Saving changes...</Text>
         </div>
       );
 
     case SaveState.SAVED:
       return (
         <div className="inline">
-          <SaveIcon style={{ margin: "auto" }} />
-          <p className="info">Solution Saved</p>
+          <FontAwesomeIcon icon={faCloud} style={{ margin: "auto" }} />
+          <Text className="info">Solution Saved</Text>
         </div>
       );
 
     default:
       return (
         <div className="inline">
-          <ErrorIcon style={{ margin: "auto" }} />
-          <p className="info">You have unsaved changes</p>
+          <FontAwesomeIcon icon={faExclamation} style={{ margin: "auto" }} />
+          <Text className="info">You have unsaved changes</Text>
         </div>
       );
   }
@@ -83,83 +92,79 @@ interface IToolBarProps {
 }
 
 const ToolBar: React.FC<IToolBarProps> = (props) => {
-  function handleChange(evt: SelectChangeEvent) {
+  function handleChange(evt: any) {
     props.handleChange(evt.target.value);
   }
 
   return (
-    <div className="code-tool-bar">
-      <h2>Editor</h2>
-      <FormControl style={{ minWidth: "200px" }}>
-        <InputLabel id="language-select-label">Language</InputLabel>
+    <HStack className="code-tool-bar" spacing="1rem">
+      <Text fontSize="xl" fontWeight="bold" as="h1">
+        Editor
+      </Text>
+      <FormControl style={{ maxWidth: "20ch", position: "relative" }}>
+        <FormLabel className="floatingLabel" htmlFor="language-select">
+          Language
+        </FormLabel>
         <Select
-          labelId="language-select-label"
           id="language-select"
-          label="Language"
           onChange={handleChange}
           value={props.language}
         >
           {props.avalibleLanguages.map((language) => (
-            <MenuItem
+            <option
               id={`language-select-${language.replace("#", "sharp")}`}
               value={language}
             >
               {language}
-            </MenuItem>
+            </option>
           ))}
         </Select>
       </FormControl>
       <Indicator saveState={props.saveState} />
-      <div style={{ margin: "auto 0 auto auto" }}>
+      <Button
+        style={{ margin: "0 0 0 auto" }}
+        id="reset-solution"
+        leftIcon={<FontAwesomeIcon icon={faArrowsRotate} />}
+        variant="solid"
+        onClick={props.handleReset}
+        colorScheme="orange"
+      >
+        Reset
+      </Button>
+      {props.canSubmit && (
         <Button
-          id="reset-solution"
-          style={{ marginRight: "1rem" }}
-          color="secondary"
-          startIcon={<RefreshIcon />}
-          variant="contained"
-          onClick={props.handleReset}
+          isLoading={props.runCodeIsLoading}
+          leftIcon={<FontAwesomeIcon icon={faFloppyDisk} />}
+          colorScheme="whatsapp"
+          variant="solid"
+          onClick={props.handleSubmit}
         >
-          Reset
+          Submit Code
         </Button>
-        {props.canSubmit && (
-          <LoadingButton
-            style={{ marginRight: "1rem" }}
-            loading={props.runCodeIsLoading}
-            loadingPosition="start"
-            color="success"
-            startIcon={<SaveAltIcon />}
-            variant="contained"
-            onClick={props.handleSubmit}
-          >
-            Submit Code
-          </LoadingButton>
-        )}
-        {!props.canSubmit && (
-          <LoadingButton
-            id="run-code"
-            style={{ marginRight: "1rem" }}
-            loading={props.runCodeIsLoading}
-            loadingPosition="start"
-            color="success"
-            startIcon={<PlayArrowIcon />}
-            variant="contained"
-            onClick={props.handleRun}
-          >
-            Run Code
-          </LoadingButton>
-        )}
-      </div>
-    </div>
+      )}
+      {!props.canSubmit && (
+        <Button
+          id="run-code"
+          style={{ marginRight: "1rem" }}
+          isLoading={props.runCodeIsLoading}
+          colorScheme="whatsapp"
+          leftIcon={<FontAwesomeIcon icon={faPlay} />}
+          variant="solid"
+          onClick={props.handleRun}
+        >
+          Run Code
+        </Button>
+      )}
+    </HStack>
   );
 };
 
 const Stats: React.FC<{ data: CodeResponse | undefined }> = (props) => {
   if (!props.data) {
     return (
-      <Paper className="container container--stats">
-        <h2>Stats</h2>
-        <Divider />
-      </Paper>
+      <Card className="container container--stats">
+        <CardHeader>Stats</CardHeader>
+      </Card>
     );
   }
 
@@ -173,24 +178,26 @@ const Stats: React.FC<{ data: CodeResponse | undefined }> = (props) => {
   const maxMemory = Math.round(max / 1000);
 
   return (
-    <Paper className="container container--stats">
-      <h2>Stats</h2>
+    <Card className="container container--stats">
+      <CardHeader>Stats</CardHeader>
       <Divider />
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell align="left">Execution Time</TableCell>
-            <TableCell align="left">Memory Usage</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          <TableRow>
-            <TableCell>{props.data.executionTimeMS} ms</TableCell>
-            <TableCell>{maxMemory} kb</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </Paper>
+      <TableContainer>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Execution Time</Th>
+              <Th>Memory Usage</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{props.data.executionTimeMS} ms</Td>
+              <Td>{maxMemory} kb</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Card>
   );
 };
 
@@ -260,10 +267,8 @@ const CodeEditor: React.FC = () => {
     },
   });
 
-  const [
-    evaluate,
-    { data: evaluateData, loading: evaluateLoading },
-  ] = useLazyQuery(evaluateQuery, { fetchPolicy: "no-cache" });
+  const [evaluate, { data: evaluateData, loading: evaluateLoading }] =
+    useLazyQuery(evaluateQuery, { fetchPolicy: "no-cache" });
 
   const [save, { loading: saveLoading }] = useMutation(saveCode);
 
@@ -289,7 +294,7 @@ const CodeEditor: React.FC = () => {
   React.useEffect(() => {
     if (getCodeData) {
       if (selectedLanguage === "default") {
-        setSelectedLanguage(getCodeData.programmingTask.language);
+        setSelectedLanguage(getCodeData.programmingTask.language ?? "");
       }
       setTask(getCodeData.programmingTask);
     }
@@ -317,7 +322,7 @@ const CodeEditor: React.FC = () => {
           height: "100%",
         }}
       >
-        <CircularProgress id="spinner" />
+        <Spinner />
       </div>
     );
   }
@@ -326,7 +331,7 @@ const CodeEditor: React.FC = () => {
     if (!task) return; // Task should never be null if we have a task to run...
     evaluate({
       variables: {
-        code: task.myCode,
+        code: task.myCode ?? "",
         language: selectedLanguage,
       },
     });
@@ -365,7 +370,7 @@ const CodeEditor: React.FC = () => {
   return (
     <div className="code-zone">
       <div className="code-editor">
-        <Paper style={{ height: "50%" }}>
+        <Card style={{ height: "50%" }}>
           <ToolBar
             avalibleLanguages={task.availableLanguages as string[]} // CodeGen isn't seeing that this isn't an optional
             language={selectedLanguage}
@@ -382,34 +387,39 @@ const CodeEditor: React.FC = () => {
             runCodeIsLoading={evaluateLoading}
             canSubmit={canSubmit}
           />
+          <Divider style={{ margin: "0.5rem 0" }} />
+
           <Monaco
             codeText={task.myCode!}
-            height="90%"
+            height="100%"
             language={selectedLanguage}
             editable
             onChange={onCodeUpdated}
           />
-        </Paper>
-        <Paper style={{ height: "44%", marginTop: "1rem" }}>
+        </Card>
+        <Card style={{ height: "50%", marginTop: "1rem" }}>
           <div className="code-tool-bar">
-            <h2>Tests</h2>
+            <Text fontSize="xl" fontWeight="bold" as="h1">
+              Tests
+            </Text>
           </div>
+          <Divider style={{ marginBottom: "0.5rem" }} />
           <Monaco
             editable={false}
-            codeText={task.testCode}
+            codeText={task.testCode ?? ""}
             height="100%"
             language={selectedLanguage}
           />
-        </Paper>
+        </Card>
         <div style={{ height: "10px" }} />
       </div>
       <div className="code-zone--right">
-        <Paper className="container container--description">
+        <Card className="container container--description">
           <h2>Task</h2>
           <Divider />
           {task.description}
-        </Paper>
-        <Paper className={outputClassName}>
+        </Card>
+        <Card className={outputClassName}>
           <div style={{ display: "flex" }}>
             <h2>Output</h2>
             <div
@@ -424,7 +434,7 @@ const CodeEditor: React.FC = () => {
           </div>
           <Divider />
           <pre>{evaluateData?.evaluate.output}</pre>
-        </Paper>
+        </Card>
         <Stats data={evaluateData?.evaluate} />
       </div>
     </div>

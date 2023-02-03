@@ -1,7 +1,8 @@
 .code-zone {
   display: grid;
   grid-template-columns: 60% 40%;
-  height: 100%;
+  height: calc(100vw - 60px - 1rem);
+  width: calc(100vw - 2rem);
 }
 
 .code-editor {

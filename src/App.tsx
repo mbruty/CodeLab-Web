@@ -2,15 +2,12 @@ import React from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import pages from "./pages";
-import { CssBaseline, ThemeProvider, useMediaQuery } from "@mui/material";
-import { light, dark } from "./theme";
 import Nav from "./components/Nav";
 import UserContext from "./contexts/UserContext";
 import UserObserver from "./contexts/UserObserver";
 import { gql, useQuery } from "@apollo/client";
 import { unauthorisedCheck } from "./gql/exceptionChecks";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const getLoggedInUser = gql`
   query GetLoggedInUser {
@@ -23,12 +20,7 @@ const getLoggedInUser = gql`
 `;
 
 function App() {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const navigate = useNavigate();
-  const theme = React.useMemo(() => {
-    if (prefersDarkMode) return dark;
-    return light;
-  }, [prefersDarkMode]);
 
   const [observer] = React.useState(new UserObserver());
   const [unauthorisedError, setUnauthorisedError] = React.useState(false);
@@ -61,7 +53,7 @@ function App() {
 
   return (
     <div className="App">
-      <Snackbar
+      {/* <Snackbar
         open={unauthorisedError}
         autoHideDuration={6000}
         onClose={() => setUnauthorisedError(false)}
@@ -74,21 +66,17 @@ function App() {
         >
           You have been logged out.
         </MuiAlert>
-      </Snackbar>
+      </Snackbar> */}
       <UserContext.Provider value={observer}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline>
-            <Nav />
-            <div className="content">
-              <Routes>
-                <Route index element={<Home />} />
-                {pages.map((page) => (
-                  <Route path={page.path} element={<page.component />} />
-                ))}
-              </Routes>
-            </div>
-          </CssBaseline>
-        </ThemeProvider>
+        <Nav />
+        <div className="content">
+          <Routes>
+            <Route index element={<Home />} />
+            {pages.map((page) => (
+              <Route path={page.path} element={<page.component />} />
+            ))}
+          </Routes>
+        </div>
       </UserContext.Provider>
     </div>
   );
