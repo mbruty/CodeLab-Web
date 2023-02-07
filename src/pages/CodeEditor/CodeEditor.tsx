@@ -26,6 +26,7 @@ import {
   Th,
   Thead,
   Tr,
+  VStack,
 } from "@chakra-ui/react";
 import {
   faFloppyDisk,
@@ -370,7 +371,7 @@ const CodeEditor: React.FC = () => {
   return (
     <div className="code-zone">
       <div className="code-editor">
-        <Card style={{ height: "50%" }}>
+        <Card style={{ height: "calc((100vh / 2) - 55px)" }}>
           <ToolBar
             avalibleLanguages={task.availableLanguages as string[]} // CodeGen isn't seeing that this isn't an optional
             language={selectedLanguage}
@@ -397,7 +398,7 @@ const CodeEditor: React.FC = () => {
             onChange={onCodeUpdated}
           />
         </Card>
-        <Card style={{ height: "50%", marginTop: "1rem" }}>
+        <Card style={{ height: "calc((100vh / 2) - 55px)", marginTop: "1rem" }}>
           <div className="code-tool-bar">
             <Text fontSize="xl" fontWeight="bold" as="h1">
               Tests
@@ -413,7 +414,7 @@ const CodeEditor: React.FC = () => {
         </Card>
         <div style={{ height: "10px" }} />
       </div>
-      <div className="code-zone--right">
+      <VStack className="code-zone--right">
         <Card className="container container--description">
           <h2>Task</h2>
           <Divider />
@@ -436,7 +437,7 @@ const CodeEditor: React.FC = () => {
           <pre>{evaluateData?.evaluate.output}</pre>
         </Card>
         <Stats data={evaluateData?.evaluate} />
-      </div>
+      </VStack>
     </div>
   );
 };

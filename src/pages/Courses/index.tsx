@@ -1,10 +1,21 @@
 import React from "react";
 import "./index.tsx.css";
 import { Doughnut } from "react-chartjs-2";
+import { Chart, ArcElement } from "chart.js";
 import { Link } from "react-router-dom";
 import { graphql } from "../../gql";
 import { useQuery } from "@apollo/client";
-import { Card, Spinner,Divider } from "@chakra-ui/react";
+import {
+  Card,
+  Spinner,
+  Divider,
+  Heading,
+  HStack,
+  VStack,
+  Grid,
+  GridItem,
+} from "@chakra-ui/react";
+Chart.register(ArcElement);
 
 const myModules = graphql(`
   query myModules {
@@ -59,69 +70,92 @@ const Courses: React.FC = () => {
   }
 
   console.log(modules);
-  
+
   return (
     <div className="courses-page">
-      <div style={{ paddingRight: "1rem" }}>
-        <h1>Recent Activity</h1>
-        <div style={{ display: "flex", flexDirection: "row" }}>
+      <VStack
+        align="flex-start"
+        divider={<Divider />}
+        paddingLeft="1"
+        paddingRight="1"
+      >
+        <Heading as="h1" fontSize="xxx-large">
+          Recent Activity
+        </Heading>
+        <HStack style={{ width: "100%" }}>
           <Doughnut
             height={200}
             width={200}
             data={data}
             options={{ maintainAspectRatio: false, responsive: false }}
           />
-          <div className="col-2 doughnut-grid">
+          <Grid
+            style={{ width: "100%" }}
+            templateColumns="repeat(2, 1fr)"
+            gap={1}
+          >
             {data.datasets[0].data.map((item, idx) => (
-              <div className="doughnut-legend">
+              <GridItem className="doughnut-legend">
                 <div
                   className="circle"
                   style={{ backgroundColor: chartColors[idx] }}
                 ></div>
                 {data.labels[idx]}: {item}&nbsp;minutes
-              </div>
+              </GridItem>
             ))}
-          </div>
-        </div>
+          </Grid>
+        </HStack>
         <div>
-          <div>
-            <Divider style={{ marginTop: "1rem" }} />
-            <h2>Enroled Modules</h2>
-            <div className="col-2">
-              {modules && modules.myModules.map((item, idx) => (
-                <div className="module-card">
-                  <Link to={`/module/${item?.id}`}>
-                    <h3>{item?.title}</h3>
-                  </Link>
-                  <div style={{ position: "relative" }}>
-                    <Doughnut
-                      height={74}
-                      width={74}
-                      data={{
-                        datasets: [
-                          {
-                            data: [item?.completedPct, 100 - (item?.completedPct ?? 0)],
-                            backgroundColor: moduleChartColors,
-                          },
-                        ],
-                      }}
-                      options={{
-                        maintainAspectRatio: false,
-                        responsive: false,
-                      }}
-                    />
-                    <div className="module--complete-pct">
-                      {item?.completedPct}%
-                    </div>
-                  </div>
-                </div>
+          <Divider style={{ marginTop: "2rem" }} />
+          <Heading as="h2" fontSize="xx-large">
+            Enroled Modules
+          </Heading>
+          <Grid
+            templateColumns="repeat(2, 1fr)"
+            gap="1"
+            style={{ marginTop: "1rem" }}
+          >
+            {modules &&
+              modules.myModules.map((item, idx) => (
+                <Link to={`/module/${item?.id}`}>
+                  <Card padding="1" paddingLeft="2">
+                    <HStack>
+                      <Heading as="h3" fontSize="lg">
+                        {item?.title}
+                      </Heading>
+                      <div style={{ position: "relative" }}>
+                        <Doughnut
+                          height={74}
+                          width={74}
+                          data={{
+                            datasets: [
+                              {
+                                data: [
+                                  item?.completedPct,
+                                  100 - (item?.completedPct ?? 0),
+                                ],
+                                backgroundColor: moduleChartColors,
+                              },
+                            ],
+                          }}
+                          options={{
+                            maintainAspectRatio: false,
+                            responsive: false,
+                          }}
+                        />
+                        <div className="module--complete-pct">
+                          {item?.completedPct}%
+                        </div>
+                      </div>
+                    </HStack>
+                  </Card>
+                </Link>
               ))}
-            </div>
-          </div>
+          </Grid>
         </div>
-      </div>
+      </VStack>
       <Card style={{ padding: "0 1rem", overflow: "scroll" }}>
-        <h2>Recently Accessed Courses</h2>
+        <Heading as="h2">Recently Accessed Courses</Heading>
         <Divider />
         {/* {modules.map((item) => (
           <>
@@ -133,7 +167,7 @@ const Courses: React.FC = () => {
           </>
         ))} */}
         <Divider />
-        <h2>Popular Free Courses</h2>
+        <Heading as="h2">Popular Free Courses</Heading>
         <Divider />
         {/* {modules.map((item) => (
           <>

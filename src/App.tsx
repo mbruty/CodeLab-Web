@@ -1,13 +1,12 @@
 import React from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
-import pages from "./pages";
+import { NAV_ITEMS } from "components/Nav";
 import Nav from "./components/Nav";
 import UserContext from "./contexts/UserContext";
 import UserObserver from "./contexts/UserObserver";
 import { gql, useQuery } from "@apollo/client";
 import { unauthorisedCheck } from "./gql/exceptionChecks";
-import { ChakraProvider } from "@chakra-ui/react";
 
 const getLoggedInUser = gql`
   query GetLoggedInUser {
@@ -23,9 +22,9 @@ function App() {
   const navigate = useNavigate();
 
   const [observer] = React.useState(new UserObserver());
-  const [unauthorisedError, setUnauthorisedError] = React.useState(false);
+  const setUnauthorisedError = React.useState(false)[1];
   // Get the current logged in user
-  const { loading: userLoading, error: userError } = useQuery(getLoggedInUser);
+  const { data, loading: userLoading, error: userError } = useQuery(getLoggedInUser);
 
   // Subscribe to the observer on the first render
   React.useEffect(() => {
@@ -33,19 +32,25 @@ function App() {
       onUpdate: (u) => {},
       onAuthFail: () => {
         setUnauthorisedError(true);
-        navigate("/log-in");
+        navigate("/sign-in");
       },
-      guid: null,
     });
 
     return () => {
       observer.unsubscribe(id);
     };
-  }, [navigate, observer]);
+  }, [navigate, observer, setUnauthorisedError]);
 
   React.useEffect(() => {
     unauthorisedCheck(userError, observer);
   }, [userError, observer]);
+
+  // When we get data, set it on the observer
+  React.useEffect(() => {
+    if (data) {
+      observer.update(data.me);
+    }
+  }, [data, observer])
 
   if (userLoading) {
     return <p>Loading</p>;
@@ -72,7 +77,7 @@ function App() {
         <div className="content">
           <Routes>
             <Route index element={<Home />} />
-            {pages.map((page) => (
+            {NAV_ITEMS.map((page) => (
               <Route path={page.path} element={<page.component />} />
             ))}
           </Routes>

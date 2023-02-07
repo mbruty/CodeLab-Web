@@ -3,6 +3,7 @@
   grid-template-columns: 60% 40%;
   height: calc(100vw - 60px - 1rem);
   width: calc(100vw - 2rem);
+  overflow: hidden;
 }
 
 .code-editor {
@@ -57,11 +58,14 @@
   overflow: scroll;
   margin-bottom: 0;
 }
+
 .code-zone--right {
-  display: flex;
-  flex-direction: column;
   margin-left: 1rem;
-  justify-content: space-between;
+  max-height: calc(100vh - 2rem - 60px);
+}
+
+.code-zone--right > div {
+  width: 100%;
 }
 
 .output {

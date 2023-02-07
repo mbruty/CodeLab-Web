@@ -25,6 +25,8 @@ code {
 
 .App {
   background-color: var(--chakra-colors-gray-200);
+  height: 100vh;
+  overflow: hidden;
 }
 
 

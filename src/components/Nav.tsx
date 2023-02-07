@@ -6,25 +6,54 @@ import {
   Button,
   Stack,
   Collapse,
-  Icon,
   Link,
   Popover,
   PopoverTrigger,
-  PopoverContent,
   useColorModeValue,
-  useBreakpointValue,
   useDisclosure,
+  Center,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
-import {
-  HamburgerIcon,
-  CloseIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-} from "@chakra-ui/icons";
+import { useContext, useState, useEffect } from "react";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import CodeEditor from "pages/CodeEditor/CodeEditor";
+import Courses from "pages/Courses";
+import SignUp from "pages/SignUp/SignUp";
+import LogIn from "pages/LogIn";
+import ModulePage from "pages/ModulePage";
+import { NavLink, useNavigate } from "react-router-dom";
+import { faSchool } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import UserContext from "contexts/UserContext";
+import { User } from "gql/graphql";
+import { graphql } from "gql";
+import { useMutation } from "@apollo/client";
+
+const logoutMutation = graphql(`
+  mutation Logout {
+    logout
+  }
+`);
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
+  const navigate = useNavigate();
+  const userContext = useContext(UserContext);
+  const [user, setUser] = useState<User | undefined>(userContext.user);
+  const logout = useMutation(logoutMutation)[0];
+  useEffect(() => {
+    const id = userContext.subscribe({
+      onUpdate: (u) => setUser(u),
+    });
 
+    return () => userContext.unsubscribe(id);
+  }, [user, userContext]);
   return (
     <Box>
       <Flex
@@ -53,13 +82,13 @@ export default function WithSubnavigation() {
           />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <Text
-            textAlign={useBreakpointValue({ base: "center", md: "left" })}
-            fontFamily={"heading"}
-            color={useColorModeValue("gray.800", "white")}
-          >
-            Logo
-          </Text>
+          <NavLink to="/">
+            <img
+              height="50px"
+              src={process.env.PUBLIC_URL + "/logo.svg"}
+              alt="logo"
+            />
+          </NavLink>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav />
@@ -72,27 +101,61 @@ export default function WithSubnavigation() {
           direction={"row"}
           spacing={6}
         >
-          <Button
-            as={"a"}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            href={"#"}
-          >
-            Sign In
-          </Button>
-          <Button
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"pink.400"}
-            _hover={{
-              bg: "pink.300",
-            }}
-          >
-            Sign Up
-          </Button>
+          {user ? (
+            <Menu>
+              <MenuButton
+                as={Button}
+                rounded={"full"}
+                variant={"link"}
+                cursor={"pointer"}
+                minW={0}
+              >
+                <Avatar
+                  src={`https://api.dicebear.com/5.x/adventurer/svg?seed=${user.username}`}
+                  size="sm"
+                />
+              </MenuButton>
+              <MenuList>
+                <MenuItem
+                  onClick={async () => {
+                    await logout();
+                    navigate("/sign-in");
+                    userContext.update(undefined);
+                  }}
+                >
+                  Sign out
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <>
+              <Button
+                fontSize={"sm"}
+                fontWeight={400}
+                variant={"link"}
+                onClick={() => {
+                  navigate("/sign-in");
+                }}
+              >
+                Sign In
+              </Button>
+              <Button
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                bg={"pink.400"}
+                _hover={{
+                  bg: "pink.300",
+                }}
+                onClick={() => {
+                  navigate("/sign-up");
+                }}
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
 
@@ -104,88 +167,22 @@ export default function WithSubnavigation() {
 }
 
 const DesktopNav = () => {
-  const linkColor = useColorModeValue("gray.600", "gray.200");
-  const linkHoverColor = useColorModeValue("gray.800", "white");
-  const popoverContentBgColor = useColorModeValue("white", "gray.800");
-
   return (
     <Stack direction={"row"} spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Popover trigger={"hover"} placement={"bottom-start"}>
-            <PopoverTrigger>
-              <Link
-                p={2}
-                href={navItem.href ?? "#"}
-                fontSize={"sm"}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: "none",
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </Link>
-            </PopoverTrigger>
-
-            {navItem.children && (
-              <PopoverContent
-                border={0}
-                boxShadow={"xl"}
-                bg={popoverContentBgColor}
-                p={4}
-                rounded={"xl"}
-                minW={"sm"}
-              >
-                <Stack>
-                  {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
+      {NAV_ITEMS.filter((x) => x.isVisibleInNav).map((navItem) => (
+        <Center key={navItem.text}>
+          <Box borderRadius="lg" padding="1">
+            {navItem.icon && (
+              <FontAwesomeIcon
+                icon={navItem.icon}
+                style={{ marginRight: "0.5rem" }}
+              />
             )}
-          </Popover>
-        </Box>
+            <NavLink to={navItem.path ?? "#"}>{navItem.text}</NavLink>
+          </Box>
+        </Center>
       ))}
     </Stack>
-  );
-};
-
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
-  return (
-    <Link
-      href={href}
-      role={"group"}
-      display={"block"}
-      p={2}
-      rounded={"md"}
-      _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
-    >
-      <Stack direction={"row"} align={"center"}>
-        <Box>
-          <Text
-            transition={"all .3s ease"}
-            _groupHover={{ color: "pink.400" }}
-            fontWeight={500}
-          >
-            {label}
-          </Text>
-          <Text fontSize={"sm"}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={"all .3s ease"}
-          transform={"translateX(-10px)"}
-          opacity={0}
-          _groupHover={{ opacity: "100%", transform: "translateX(0)" }}
-          justify={"flex-end"}
-          align={"center"}
-          flex={1}
-        >
-          <Icon color={"pink.400"} w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
-    </Link>
   );
 };
 
@@ -196,22 +193,20 @@ const MobileNav = () => {
       p={4}
       display={{ md: "none" }}
     >
-      {NAV_ITEMS.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
+      {NAV_ITEMS.filter((x) => x.isVisibleInNav).map((navItem) => (
+        <MobileNavItem key={navItem.text} {...navItem} />
       ))}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, children, href }: NavItem) => {
-  const { isOpen, onToggle } = useDisclosure();
-
+const MobileNavItem = ({ text, path }: NavItem) => {
   return (
-    <Stack spacing={4} onClick={children && onToggle}>
+    <Stack spacing={4}>
       <Flex
         py={2}
         as={Link}
-        href={href ?? "#"}
+        href={path ?? "#"}
         justify={"space-between"}
         align={"center"}
         _hover={{
@@ -222,84 +217,55 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
           fontWeight={600}
           color={useColorModeValue("gray.600", "gray.200")}
         >
-          {label}
+          {text}
         </Text>
-        {children && (
-          <Icon
-            as={ChevronDownIcon}
-            transition={"all .25s ease-in-out"}
-            transform={isOpen ? "rotate(180deg)" : ""}
-            w={6}
-            h={6}
-          />
-        )}
       </Flex>
-
-      <Collapse in={isOpen} animateOpacity style={{ marginTop: "0!important" }}>
-        <Stack
-          mt={2}
-          pl={4}
-          borderLeft={1}
-          borderStyle={"solid"}
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          align={"start"}
-        >
-          {children &&
-            children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
-                {child.label}
-              </Link>
-            ))}
-        </Stack>
-      </Collapse>
     </Stack>
   );
 };
 
 interface NavItem {
-  label: string;
-  subLabel?: string;
-  children?: Array<NavItem>;
-  href?: string;
+  text: string;
+  component: React.FC;
+  isVisibleInNav: boolean;
+  icon: IconProp | undefined;
+  path?: string;
 }
 
-const NAV_ITEMS: Array<NavItem> = [
+export const NAV_ITEMS: Array<NavItem> = [
   {
-    label: "Inspiration",
-    children: [
-      {
-        label: "Explore Design Work",
-        subLabel: "Trending Design to inspire you",
-        href: "#",
-      },
-      {
-        label: "New & Noteworthy",
-        subLabel: "Up-and-coming Designers",
-        href: "#",
-      },
-    ],
+    component: LogIn,
+    path: "/sign-in",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
   },
   {
-    label: "Find Work",
-    children: [
-      {
-        label: "Job Board",
-        subLabel: "Find your dream design job",
-        href: "#",
-      },
-      {
-        label: "Freelance Projects",
-        subLabel: "An exclusive list for contract work",
-        href: "#",
-      },
-    ],
+    component: SignUp,
+    path: "/sign-up",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
   },
   {
-    label: "Learn Design",
-    href: "#",
+    component: CodeEditor,
+    path: "/code/:taskid",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
   },
   {
-    label: "Hire Designers",
-    href: "#",
+    component: Courses,
+    path: "/courses",
+    text: "Courses",
+    isVisibleInNav: true,
+    icon: faSchool,
+  },
+  {
+    component: ModulePage,
+    path: "/module/:moduleid",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
   },
 ];
