@@ -35,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Ensure prod url
-        run: echo "export const API_URL = \"http://gql.bruty.net/graphql\";" > ./src/config.ts
+        run: echo "export const API_URL = \"https://gql.bruty.net/graphql\";" > ./src/config.ts
       - name: Log in to GitHub Docker Registry
         uses: docker/login-action@v2.1.0
         with:
