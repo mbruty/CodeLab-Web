@@ -37,6 +37,8 @@ import {
   faExclamation,
   faCloudBolt,
 } from "@fortawesome/free-solid-svg-icons";
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 enum SaveState {
   SAVING,
@@ -132,7 +134,7 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
       >
         Reset
       </Button>
-      {props.canSubmit && (
+      {/* {props.canSubmit && (
         <Button
           isLoading={props.runCodeIsLoading}
           leftIcon={<FontAwesomeIcon icon={faFloppyDisk} />}
@@ -143,7 +145,7 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
           Submit Code
         </Button>
       )}
-      {!props.canSubmit && (
+      {!props.canSubmit && ( */}
         <Button
           id="run-code"
           style={{ marginRight: "1rem" }}
@@ -155,7 +157,7 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
         >
           Run Code
         </Button>
-      )}
+      {/* )} */}
     </HStack>
   );
 };
@@ -218,8 +220,8 @@ const getCode = graphql(`
 `);
 
 const evaluateQuery = graphql(`
-  query Evaluate($code: String!, $language: String!) {
-    evaluate(code: $code, language: $language, taskId: 1) {
+  query Evaluate($code: String!, $language: String!, $taskId: Int!) {
+    evaluate(code: $code, language: $language, taskId: $taskId) {
       output
       stats {
         mem
@@ -334,6 +336,7 @@ const CodeEditor: React.FC = () => {
       variables: {
         code: task.myCode ?? "",
         language: selectedLanguage,
+        taskId
       },
     });
   }
@@ -418,7 +421,7 @@ const CodeEditor: React.FC = () => {
         <Card className="container container--description">
           <h2>Task</h2>
           <Divider />
-          {task.description}
+          <ReactMarkdown children={task.description} remarkPlugins={[remarkGfm]} />
         </Card>
         <Card className={outputClassName}>
           <div style={{ display: "flex" }}>
