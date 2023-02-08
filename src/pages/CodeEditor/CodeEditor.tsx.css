@@ -47,6 +47,70 @@
   flex-direction: column;
 }
 
+.container--description h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.container--description h2 {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.container--description table {
+  margin: 1rem 0;
+  border: 2px solid var(--chakra-colors-chakra-border-color);
+  background-color: var(--chakra-colors-chakra-body-bg);
+  width: 100%;
+  height: 200px;
+  text-align: center;
+  border-collapse: collapse;
+}
+.container--description td,
+.container--description th {
+  border: 1px solid var(--chakra-colors-chakra-border-color);
+  padding: 3px 2px;
+}
+.container--description tbody td {
+  font-size: 13px;
+  color: var(--chakra-colors-chakra-body-text)
+}
+.container--description tr:nth-child(even) {
+  background-color: var(--chakra-colors-chakra-subtle-bg);
+}
+.container--description thead {
+  background: var(--chakra-colors-chakra-subtle-bg);
+  border-bottom: 3px solid var(--chakra-colors-chakra-border-color);
+}
+.container--description thead th {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--chakra-colors-chakra-body-text);
+  text-align: center;
+  border-left: 2px solid var(--chakra-colors-chakra-border-color);
+}
+.container--description thead th:first-child {
+  border-left: none;
+}
+
+.container--description tfoot {
+  font-size: 12px;
+  font-weight: bold;
+  color: #e6e6e6;
+  background: #000000;
+  background: -moz-linear-gradient(top, #404040 0%, #191919 66%, #000000 100%);
+  background: -webkit-linear-gradient(
+    top,
+    #404040 0%,
+    #191919 66%,
+    #000000 100%
+  );
+  background: linear-gradient(to bottom, #404040 0%, #191919 66%, #000000 100%);
+  border-top: 1px solid #4a4a4a;
+}
+.container--description tfoot td {
+  font-size: 12px;
+}
 .container--output {
   height: 40%;
   overflow: scroll;
