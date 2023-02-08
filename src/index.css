@@ -14,7 +14,7 @@ code {
 
 .content {
   margin: 1rem;
-  width: 100vw;
+  width: calc(100vw - 2rem);
   height: 100vh;
 }
 
@@ -28,7 +28,6 @@ code {
   height: 100vh;
   overflow: hidden;
 }
-
 
 .floatingLabel {
   top: 12px;
