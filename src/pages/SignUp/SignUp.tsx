@@ -1,196 +1,210 @@
-import Box from "@mui/material/Box";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import React from "react";
-import Paper from "@mui/material/Paper";
-import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
+import {
+  Flex,
+  Box,
+  FormControl,
+  FormLabel,
+  Input,
+  InputGroup,
+  HStack,
+  InputRightElement,
+  Stack,
+  Button,
+  Heading,
+  Text,
+  useColorModeValue,
+  Link,
+  Center,
+  useToast,
+} from "@chakra-ui/react";
+import { useState, useContext, useEffect } from "react";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { NavLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import useDebounce from "../../utils/debounce";
-import "./SignUp.tsx.css";
-import { gql, useMutation } from "@apollo/client";
-import UserContext from "../../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
+import ValidationError from "yup/lib/ValidationError";
+import { graphql } from "gql";
+import { useMutation } from "@apollo/client";
+import UserContext from "contexts/UserContext";
+import { User } from "gql/graphql";
 
-const TabPanel: React.FC<{
-  value: number;
-  index: number;
-  children: JSX.Element;
-}> = (props) => {
-  if (props.value !== props.index) return null;
-  return props.children;
-};
+const schema = yup.object({
+  email: yup
+    .string()
+    .required("Please provide an email")
+    .max(50, "Your email is too long")
+    .email("Email is invalid"),
+  username: yup
+    .string()
+    .required("Please provide your nickname")
+    .max(25, "Your nickname is too long!"),
+  password: yup
+    .string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+      "Password must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+    ),
+});
 
-const loginMutation = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
+const signUpMutation = graphql(`
+  mutation SignUp($email: String!, $password: String!, $username: String!) {
+    signUp(email: $email, password: $password, username: $username) {
+      id
       username
-      xp
     }
   }
-`;
+`);
 
-const LoginForm: React.FC = () => {
-  const observer = React.useContext(UserContext);
+export default function SignupCard() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [nick, setNick] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mutateFunc, { loading, error }] = useMutation(signUpMutation);
+  const userContext = useContext(UserContext);
+  const toast = useToast();
   const navigate = useNavigate();
-  const [password, setPassword] = React.useState("");
-  const [mutateFunction, { data, loading, error }] = useMutation(loginMutation);
-  const [email, setDebounceEmail] = useDebounce<string>(
-    "",
-    handleEmailChange,
-    1000
-  );
-  const [loginError, setLoginError] = React.useState({
-    email: "",
-    password: "",
-    login: "",
-  });
 
-  // if we have data back, then it was successful
-  React.useEffect(() => {
-    if (data) {
-      observer.update(data.login);
+  useEffect(() => {
+    // If we have a logged in user, send 'em to the home page
+    if (userContext.user) {
+      toast({
+        isClosable: true,
+        status: "info",
+        duration: 5000,
+        title: "Already logged in",
+      });
       navigate("/");
     }
-  }, [data, navigate, observer]);
+  }, [userContext, navigate, toast]);
 
-  // if we have an unauthorised error, tell the user
-  React.useEffect(() => {
-    if (
-      error &&
-      error.message.startsWith(
-        "net.bruty.CodeLabs.graphql.exceptions.UnauthorisedException"
-      )
-    ) {
-      setLoginError((prev) => {
-        return { ...prev, login: "Incorrect username or password" };
+  async function signup() {
+    const vars = {
+      username: nick,
+      email,
+      password,
+    };
+    try {
+      await schema.validate(vars, { abortEarly: false });
+    } catch (e: unknown) {
+      const error = e as ValidationError;
+      error.errors.forEach((err) => {
+        toast({
+          isClosable: true,
+          status: "error",
+          duration: 5000,
+          title: "Oops, there was an error checking your details.",
+          description: err,
+        });
       });
-    }
-  }, [error]);
-
-  async function handleEmailChange(email: string) {
-    const validation = yup.string().email();
-
-    if (!(await validation.isValid(email))) {
-      setLoginError({ ...loginError, email: "Invalid email" });
-    } else {
-      setLoginError({ ...loginError, email: "" });
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const validation = yup.string().email();
-    if (!(await validation.isValid(email))) {
-      setLoginError({ ...loginError, email: "Invalid email" });
-      return;
-    }
-    if (password === "") {
       return;
     }
 
-    mutateFunction({
-      variables: {
-        email,
-        password,
-      },
-    });
+    try {
+      const result = await mutateFunc({ variables: vars });
+      if (result.data) {
+        userContext.update(result.data?.signUp as User);
+        navigate("/");
+      }
+    } catch (e: any) {
+      if (
+        (e.message as string).startsWith(
+          "net.bruty.CodeLabs.graphql.exceptions.AlreadyExistsException"
+        )
+      ) {
+        toast({
+          isClosable: true,
+          status: "error",
+          duration: 5000,
+          title: "Oops, there was an error creating your account",
+          description: "Your email is already in use",
+        });
+      } else {
+        toast({
+          isClosable: true,
+          status: "error",
+          duration: 5000,
+          title: "Oops, there was an error creating your account",
+          description: "Please try again later",
+        });
+      }
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FormControl variant="outlined" fullWidth className="login-form">
-        <TextField
-          className="login-input"
-          id="email"
-          label="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setDebounceEmail(e.target.value)}
-        />
-        {loginError.email && <p className="form-error">{loginError.email}</p>}
-        <TextField
-          className="login-input"
-          id="password"
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {loginError.password && (
-          <p className="form-error">{loginError.password}</p>
-        )}
-        {loginError.login && <p className="form-error">{loginError.login}</p>}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
+    <Center>
+      <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
+        <Stack align={"center"}>
+          <Heading fontSize={"4xl"} textAlign={"center"}>
+            Sign up
+          </Heading>
+        </Stack>
+        <Box
+          rounded={"lg"}
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow={"lg"}
+          p={8}
         >
-          <Button
-            style={{ margin: "1rem 0 0 auto" }}
-            variant="outlined"
-            id="login-as-demo"
-            onClick={() => {
-              mutateFunction({
-                variables: {
-                  email: "demo@gmail.com",
-                  password: "password123",
-                },
-              });
-            }}
-          >
-            Login as demo
-          </Button>
-          <Button
-            style={{ margin: "1rem 0 0 1rem" }}
-            variant="outlined"
-            type="submit"
-            id="submit"
-          >
-            {loading && (
-              <CircularProgress size="15px" style={{ marginRight: "0.5rem" }} />
-            )}
-            Login
-          </Button>
-        </div>
-      </FormControl>
-    </form>
+          <Stack spacing={4}>
+            <Box>
+              <FormControl id="firstName" isRequired>
+                <FormLabel>Nick name (max 25)</FormLabel>
+                <Input
+                  value={nick}
+                  onChange={(e) => setNick(e.target.value)}
+                  type="text"
+                />
+              </FormControl>
+            </Box>
+            <FormControl id="email" isRequired>
+              <FormLabel>Email address</FormLabel>
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+              />
+            </FormControl>
+            <FormControl id="password" isRequired>
+              <FormLabel>Password</FormLabel>
+              <InputGroup>
+                <Input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"}
+                />
+                <InputRightElement h={"full"}>
+                  <Button
+                    variant={"ghost"}
+                    onClick={() =>
+                      setShowPassword((showPassword) => !showPassword)
+                    }
+                  >
+                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
+            <Stack spacing={10} pt={2}>
+              <Button
+                loadingText="Submitting"
+                size="lg"
+                bg={"blue.400"}
+                color={"white"}
+                _hover={{
+                  bg: "blue.500",
+                }}
+                onClick={signup}
+              >
+                Sign up
+              </Button>
+            </Stack>
+            <Text align={"center"}>
+              Already a user?{" "}
+              <NavLink to="/sign-in" color={"blue.400"}>
+                <Link color="blue.400">Login</Link>
+              </NavLink>
+            </Text>
+          </Stack>
+        </Box>
+      </Stack>
+    </Center>
   );
-};
-
-const SignUp: React.FC = () => {
-  const [tab, setTab] = React.useState(
-    window.location.pathname === "/log-in" ? 1 : 0
-  );
-  return (
-    <Paper style={{ maxWidth: "600px", padding: "1rem", margin: "auto" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={tab}
-          onChange={(_, idx: number) => setTab(idx)}
-          aria-label="basic tabs example"
-          variant="fullWidth"
-        >
-          <Tab
-            label="Sign Up"
-            id="signup-tab"
-            aria-controls="signup-tab-pannel"
-          />
-          <Tab label="Login" id="login-tab" aria-controls="login-tab-pannel" />
-        </Tabs>
-      </Box>
-      <TabPanel value={tab} index={0}>
-        <div>Item One</div>
-      </TabPanel>
-      <TabPanel value={tab} index={1}>
-        <LoginForm />
-      </TabPanel>
-    </Paper>
-  );
-};
-
-export default SignUp;
+}

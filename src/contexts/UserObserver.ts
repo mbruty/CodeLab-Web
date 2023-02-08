@@ -3,13 +3,13 @@ import { User } from "../gql/graphql";
 
 export interface IUserWatcher {
   onUpdate: (user: User) => void;
-  onAuthFail: () => void | null;
-  guid: Guid | null;
+  onAuthFail?: () => void;
+  guid?: Guid;
 }
 
 class UserObserver {
   private observers: Array<IUserWatcher> = [];
-  private user: User | undefined;
+  public user: User | undefined;
 
   public subscribe(watcher: IUserWatcher): Guid {
     const observerId = Guid.create();
@@ -24,14 +24,14 @@ class UserObserver {
     );
   }
 
-  public update(user: User) {
+  public update(user: User | undefined) {
     this.user = user;
     this.onChange();
   }
 
   public notifyUnauthorised() {
     this.observers.forEach((o) => {
-      if (o.onAuthFail !== null) {
+      if (o.onAuthFail) {
         o.onAuthFail();
       }
     });

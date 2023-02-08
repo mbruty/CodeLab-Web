@@ -1,66 +1,271 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import pages from '../pages';
-import {useNavigate} from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
+import {
+  Box,
+  Flex,
+  Text,
+  IconButton,
+  Button,
+  Stack,
+  Collapse,
+  Link,
+  Popover,
+  PopoverTrigger,
+  useColorModeValue,
+  useDisclosure,
+  Center,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from "@chakra-ui/react";
+import { useContext, useState, useEffect } from "react";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
-const drawerWidth = 180;
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import CodeEditor from "pages/CodeEditor/CodeEditor";
+import Courses from "pages/Courses";
+import SignUp from "pages/SignUp/SignUp";
+import LogIn from "pages/LogIn";
+import ModulePage from "pages/ModulePage";
+import { NavLink, useNavigate } from "react-router-dom";
+import { faSchool } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import UserContext from "contexts/UserContext";
+import { User } from "gql/graphql";
+import { graphql } from "gql";
+import { useMutation } from "@apollo/client";
 
-export default function Nav() {
-    const navigate = useNavigate();
+const logoutMutation = graphql(`
+  mutation Logout {
+    logout
+  }
+`);
 
-    const navItems = pages.filter(x => x.isVisibleInNav);
+export default function WithSubnavigation() {
+  const { isOpen, onToggle } = useDisclosure();
+  const navigate = useNavigate();
+  const userContext = useContext(UserContext);
+  const [user, setUser] = useState<User | undefined>(userContext.user);
+  const logout = useMutation(logoutMutation)[0];
+  useEffect(() => {
+    const id = userContext.subscribe({
+      onUpdate: (u) => setUser(u),
+    });
 
-    return (
-        <Box sx={{display: 'flex'}}>
-            <AppBar position="fixed" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
-                <Toolbar>
-                    <Typography variant="h6" noWrap component="div">
-                        <b>Code Lab</b>
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-            <Drawer
-                variant="permanent"
-                sx={{
-                    width: drawerWidth,
-                    flexShrink: 0,
-                    [`& .MuiDrawer-paper`]: {width: drawerWidth, boxSizing: 'border-box'},
+    return () => userContext.unsubscribe(id);
+  }, [user, userContext]);
+  return (
+    <Box>
+      <Flex
+        bg={useColorModeValue("white", "gray.800")}
+        color={useColorModeValue("gray.600", "white")}
+        minH={"60px"}
+        py={{ base: 2 }}
+        px={{ base: 4 }}
+        borderBottom={1}
+        borderStyle={"solid"}
+        borderColor={useColorModeValue("gray.200", "gray.900")}
+        align={"center"}
+      >
+        <Flex
+          flex={{ base: 1, md: "auto" }}
+          ml={{ base: -2 }}
+          display={{ base: "flex", md: "none" }}
+        >
+          <IconButton
+            onClick={onToggle}
+            icon={
+              isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
+            }
+            variant={"ghost"}
+            aria-label={"Toggle Navigation"}
+          />
+        </Flex>
+        <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
+          <NavLink to="/">
+            <img
+              height="50px"
+              src={process.env.PUBLIC_URL + "/logo.svg"}
+              alt="logo"
+            />
+          </NavLink>
+
+          <Flex display={{ base: "none", md: "flex" }} ml={10}>
+            <DesktopNav />
+          </Flex>
+        </Flex>
+
+        <Stack
+          flex={{ base: 1, md: 0 }}
+          justify={"flex-end"}
+          direction={"row"}
+          spacing={6}
+        >
+          {user ? (
+            <Menu>
+              <MenuButton
+                as={Button}
+                rounded={"full"}
+                variant={"link"}
+                cursor={"pointer"}
+                minW={0}
+              >
+                <Avatar
+                  src={`https://api.dicebear.com/5.x/adventurer/svg?seed=${user.username}`}
+                  size="sm"
+                />
+              </MenuButton>
+              <MenuList>
+                <MenuItem
+                  onClick={async () => {
+                    await logout();
+                    navigate("/sign-in");
+                    userContext.update(undefined);
+                  }}
+                >
+                  Sign out
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <>
+              <Button
+                fontSize={"sm"}
+                fontWeight={400}
+                variant={"link"}
+                onClick={() => {
+                  navigate("/sign-in");
                 }}
-            >
-                <Toolbar/>
-                <Box sx={{overflow: 'auto'}}>
-                    <List>
-                        <ListItem disablePadding>
-                            <ListItemButton onClick={() => navigate("/")}>
-                                <ListItemIcon>
-                                    <HomeIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Home"/>
-                            </ListItemButton>
-                        </ListItem>
-                        {navItems.map((item) => (
-                            <ListItem key={item.text} disablePadding>
-                                <ListItemButton onClick={() => navigate(item.path)}>
-                                    <ListItemIcon>
-                                        {item.icon !== undefined && <item.icon/>}
-                                    </ListItemIcon>
-                                    <ListItemText primary={item.text}/>
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
-                </Box>
-            </Drawer>
-        </Box>
-    );
+              >
+                Sign In
+              </Button>
+              <Button
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                bg={"pink.400"}
+                _hover={{
+                  bg: "pink.300",
+                }}
+                onClick={() => {
+                  navigate("/sign-up");
+                }}
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
+        </Stack>
+      </Flex>
+
+      <Collapse in={isOpen} animateOpacity>
+        <MobileNav />
+      </Collapse>
+    </Box>
+  );
 }
+
+const DesktopNav = () => {
+  return (
+    <Stack direction={"row"} spacing={4}>
+      {NAV_ITEMS.filter((x) => x.isVisibleInNav).map((navItem) => (
+        <Center key={navItem.text}>
+          <Box borderRadius="lg" padding="1">
+            {navItem.icon && (
+              <FontAwesomeIcon
+                icon={navItem.icon}
+                style={{ marginRight: "0.5rem" }}
+              />
+            )}
+            <NavLink to={navItem.path ?? "#"}>{navItem.text}</NavLink>
+          </Box>
+        </Center>
+      ))}
+    </Stack>
+  );
+};
+
+const MobileNav = () => {
+  return (
+    <Stack
+      bg={useColorModeValue("white", "gray.800")}
+      p={4}
+      display={{ md: "none" }}
+    >
+      {NAV_ITEMS.filter((x) => x.isVisibleInNav).map((navItem) => (
+        <MobileNavItem key={navItem.text} {...navItem} />
+      ))}
+    </Stack>
+  );
+};
+
+const MobileNavItem = ({ text, path }: NavItem) => {
+  return (
+    <Stack spacing={4}>
+      <Flex
+        py={2}
+        as={Link}
+        href={path ?? "#"}
+        justify={"space-between"}
+        align={"center"}
+        _hover={{
+          textDecoration: "none",
+        }}
+      >
+        <Text
+          fontWeight={600}
+          color={useColorModeValue("gray.600", "gray.200")}
+        >
+          {text}
+        </Text>
+      </Flex>
+    </Stack>
+  );
+};
+
+interface NavItem {
+  text: string;
+  component: React.FC;
+  isVisibleInNav: boolean;
+  icon: IconProp | undefined;
+  path?: string;
+}
+
+export const NAV_ITEMS: Array<NavItem> = [
+  {
+    component: LogIn,
+    path: "/sign-in",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
+  },
+  {
+    component: SignUp,
+    path: "/sign-up",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
+  },
+  {
+    component: CodeEditor,
+    path: "/code/:taskid",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
+  },
+  {
+    component: Courses,
+    path: "/courses",
+    text: "Courses",
+    isVisibleInNav: true,
+    icon: faSchool,
+  },
+  {
+    component: ModulePage,
+    path: "/module/:moduleid",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined,
+  },
+];
