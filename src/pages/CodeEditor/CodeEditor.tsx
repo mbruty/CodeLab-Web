@@ -165,11 +165,7 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
 
 const Stats: React.FC<{ data: CodeResponse | undefined }> = (props) => {
   if (!props.data) {
-    return (
-      <Card className="container container--stats">
-        <CardHeader>Stats</CardHeader>
-      </Card>
-    );
+    return null;
   }
 
   let max = props.data.stats.reduce((acc: number, val: Stat | null) => {
@@ -182,26 +178,22 @@ const Stats: React.FC<{ data: CodeResponse | undefined }> = (props) => {
   const maxMemory = Math.round(max / 1000);
 
   return (
-    <Card className="container container--stats">
-      <CardHeader>Stats</CardHeader>
-      <Divider />
-      <TableContainer>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Execution Time</Th>
-              <Th>Memory Usage</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{props.data.executionTimeMS} ms</Td>
-              <Td>{maxMemory} kb</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </TableContainer>
-    </Card>
+    <TableContainer>
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Execution Time</Th>
+            <Th>Memory Usage</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          <Tr>
+            <Td>{props.data.executionTimeMS} ms</Td>
+            <Td>{maxMemory} kb</Td>
+          </Tr>
+        </Tbody>
+      </Table>
+    </TableContainer>
   );
 };
 
@@ -224,6 +216,7 @@ const evaluateQuery = graphql(`
   query Evaluate($code: String!, $language: String!, $taskId: Int!) {
     evaluate(code: $code, language: $language, taskId: $taskId) {
       output
+      consoleOutput
       stats {
         mem
         cpu
@@ -434,24 +427,29 @@ const CodeEditor: React.FC = () => {
           />
         </Card>
         <Card className={outputClassName}>
-          <div style={{ display: "flex" }}>
-            <h2>Output</h2>
-            <div
-              style={{
-                marginRight: "1rem",
-                marginLeft: "auto",
-                verticalAlign: "baseline",
-              }}
-            >
-              {}
-            </div>
-          </div>
-          <Divider />
-          <pre style={{ overflowWrap: "break-word", width: "100%" }}>
-            {evaluateData?.evaluate.output}
-          </pre>
+          <Tabs isFitted variant="enclosed">
+            <TabList>
+              <Tab>Test Output</Tab>
+              <Tab>Console Output</Tab>
+              <Tab>Stats</Tab>
+            </TabList>
+            <TabPanels className="output-tab">
+              <TabPanel>
+                <pre className="code-output">
+                  {evaluateData?.evaluate.output}
+                </pre>
+              </TabPanel>
+              <TabPanel>
+                <pre className="code-output">
+                  {evaluateData?.evaluate.consoleOutput}
+                </pre>
+              </TabPanel>
+              <TabPanel>
+                <Stats data={evaluateData?.evaluate} />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </Card>
-        <Stats data={evaluateData?.evaluate} />
       </VStack>
     </div>
   );

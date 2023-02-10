@@ -42,7 +42,7 @@
 }
 
 .container--description {
-  height: 40%;
+  height: 50%;
   overflow: scroll;
   flex-direction: column;
 }
@@ -73,7 +73,7 @@
 }
 .container--description tbody td {
   font-size: 13px;
-  color: var(--chakra-colors-chakra-body-text)
+  color: var(--chakra-colors-chakra-body-text);
 }
 .container--description tr:nth-child(even) {
   background-color: var(--chakra-colors-chakra-subtle-bg);
@@ -112,15 +112,8 @@
   font-size: 12px;
 }
 .container--output {
-  height: 40%;
-  overflow: scroll;
+  height: 50%;
   flex-direction: column;
-}
-.container--stats {
-  height: 20%;
-  flex-direction: column;
-  overflow: scroll;
-  margin-bottom: 0;
 }
 
 .code-zone--right {
@@ -150,4 +143,17 @@
   font-size: small;
   font-style: italic;
   padding-left: 0.5em;
+}
+
+.code-output {
+  white-space: pre-wrap; /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+  white-space: -pre-wrap; /* Opera 4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+.output-tab {
+  height: calc((100vh / 2) - 5rem - 41px);
+  overflow: scroll;
 }
