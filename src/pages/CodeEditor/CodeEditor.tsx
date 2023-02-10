@@ -37,8 +37,9 @@ import {
   faExclamation,
   faCloudBolt,
 } from "@fortawesome/free-solid-svg-icons";
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 
 enum SaveState {
   SAVING,
@@ -146,17 +147,17 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
         </Button>
       )}
       {!props.canSubmit && ( */}
-        <Button
-          id="run-code"
-          style={{ marginRight: "1rem" }}
-          isLoading={props.runCodeIsLoading}
-          colorScheme="whatsapp"
-          leftIcon={<FontAwesomeIcon icon={faPlay} />}
-          variant="solid"
-          onClick={props.handleRun}
-        >
-          Run Code
-        </Button>
+      <Button
+        id="run-code"
+        style={{ marginRight: "1rem" }}
+        isLoading={props.runCodeIsLoading}
+        colorScheme="whatsapp"
+        leftIcon={<FontAwesomeIcon icon={faPlay} />}
+        variant="solid"
+        onClick={props.handleRun}
+      >
+        Run Code
+      </Button>
       {/* )} */}
     </HStack>
   );
@@ -336,7 +337,7 @@ const CodeEditor: React.FC = () => {
       variables: {
         code: task.myCode ?? "",
         language: selectedLanguage,
-        taskId
+        taskId,
       },
     });
   }
@@ -374,46 +375,52 @@ const CodeEditor: React.FC = () => {
   return (
     <div className="code-zone">
       <div className="code-editor">
-        <Card style={{ height: "calc((100vh / 2) - 55px)" }}>
-          <ToolBar
-            avalibleLanguages={task.availableLanguages as string[]} // CodeGen isn't seeing that this isn't an optional
-            language={selectedLanguage}
-            handleChange={(x) => {
-              setSkipChange(true);
-              setSelectedLanguage(x);
-            }}
-            handleReset={() => {
-              setTask({ ...task, myCode: task.starterCode });
-            }}
-            handleRun={evaluateCode}
-            handleSubmit={handleSubmit}
-            saveState={saveState}
-            runCodeIsLoading={evaluateLoading}
-            canSubmit={canSubmit}
-          />
-          <Divider style={{ margin: "0.5rem 0" }} />
+        <Card style={{ height: "calc(100vh - 1rem - 80px)" }}>
+          <Tabs isFitted variant="enclosed">
+            <TabList>
+              <Tab>Code</Tab>
+              <Tab>Tests</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <ToolBar
+                  avalibleLanguages={task.availableLanguages as string[]} // CodeGen isn't seeing that this isn't an optional
+                  language={selectedLanguage}
+                  handleChange={(x) => {
+                    setSkipChange(true);
+                    setSelectedLanguage(x);
+                  }}
+                  handleReset={() => {
+                    setTask({ ...task, myCode: task.starterCode });
+                  }}
+                  handleRun={evaluateCode}
+                  handleSubmit={handleSubmit}
+                  saveState={saveState}
+                  runCodeIsLoading={evaluateLoading}
+                  canSubmit={canSubmit}
+                />
+                <Divider style={{ margin: "0.5rem 0" }} />
 
-          <Monaco
-            codeText={task.myCode!}
-            height="100%"
-            language={selectedLanguage}
-            editable
-            onChange={onCodeUpdated}
-          />
-        </Card>
-        <Card style={{ height: "calc((100vh / 2) - 55px)", marginTop: "1rem" }}>
-          <div className="code-tool-bar">
-            <Text fontSize="xl" fontWeight="bold" as="h1">
-              Tests
-            </Text>
-          </div>
-          <Divider style={{ marginBottom: "0.5rem" }} />
-          <Monaco
-            editable={false}
-            codeText={task.testCode ?? ""}
-            height="100%"
-            language={selectedLanguage}
-          />
+                <Monaco
+                  codeText={task.myCode!}
+                  height="calc(100vh - 1rem - 240px)"
+                  language={selectedLanguage}
+                  editable
+                  onChange={onCodeUpdated}
+                />
+              </TabPanel>
+              <TabPanel>
+                <div className="code-tool-bar"></div>
+                <Divider style={{ marginBottom: "0.5rem" }} />
+                <Monaco
+                  editable={false}
+                  codeText={task.testCode ?? ""}
+                  height="calc(100vh - 1rem - 160px)"
+                  language={selectedLanguage}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </Card>
         <div style={{ height: "10px" }} />
       </div>
@@ -421,7 +428,10 @@ const CodeEditor: React.FC = () => {
         <Card className="container container--description">
           <h2>Task</h2>
           <Divider />
-          <ReactMarkdown children={task.description} remarkPlugins={[remarkGfm]} />
+          <ReactMarkdown
+            children={task.description}
+            remarkPlugins={[remarkGfm]}
+          />
         </Card>
         <Card className={outputClassName}>
           <div style={{ display: "flex" }}>
@@ -437,7 +447,9 @@ const CodeEditor: React.FC = () => {
             </div>
           </div>
           <Divider />
-          <pre>{evaluateData?.evaluate.output}</pre>
+          <pre style={{ overflowWrap: "break-word", width: "100%" }}>
+            {evaluateData?.evaluate.output}
+          </pre>
         </Card>
         <Stats data={evaluateData?.evaluate} />
       </VStack>
