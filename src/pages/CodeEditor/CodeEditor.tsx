@@ -40,6 +40,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import ConsoleOutput from "components/ConsoleOutput";
 
 enum SaveState {
   SAVING,
@@ -430,7 +431,7 @@ const CodeEditor: React.FC = () => {
           <Tabs isFitted variant="enclosed">
             <TabList>
               <Tab>Test Output</Tab>
-              <Tab>Console Output</Tab>
+              <Tab>Program Output</Tab>
               <Tab>Stats</Tab>
             </TabList>
             <TabPanels className="output-tab">
@@ -440,9 +441,7 @@ const CodeEditor: React.FC = () => {
                 </pre>
               </TabPanel>
               <TabPanel>
-                <pre className="code-output">
-                  {evaluateData?.evaluate.consoleOutput}
-                </pre>
+                <ConsoleOutput text={evaluateData?.evaluate.consoleOutput ?? ''} />
               </TabPanel>
               <TabPanel>
                 <Stats data={evaluateData?.evaluate} />

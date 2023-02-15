@@ -43,7 +43,7 @@
 
 .container--description {
   height: 50%;
-  overflow: scroll;
+  overflow: auto;
   flex-direction: column;
 }
 
@@ -155,5 +155,5 @@
 
 .output-tab {
   height: calc((100vh / 2) - 5rem - 41px);
-  overflow: scroll;
+  overflow: auto;
 }
