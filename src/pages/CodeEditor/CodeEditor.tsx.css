@@ -47,6 +47,10 @@
   flex-direction: column;
 }
 
+.container--description ol {
+  margin-left: 1.4rem;
+}
+
 .container--description h1 {
   font-size: 1.5rem;
   font-weight: bold;
@@ -156,4 +160,27 @@
 .output-tab {
   height: calc((100vh / 2) - 5rem - 41px);
   overflow: auto;
+}
+
+.tab--success[aria-selected="false"] {
+  background-color: #00ff005f !important;
+}
+
+.tab--failure[aria-selected="false"] {
+  color: white;
+  background-color: #ff00005f !important;
+}
+
+.tab--success[aria-selected="true"] {
+  color: black;
+  background-color: #00ff00a0 !important;
+}
+
+.tab--failure[aria-selected="true"] {
+  color: white;
+  background-color: #ff0000a0 !important;
+}
+
+.chakra-tabs__tab[aria-selected="false"] {
+  background-color: #f4f4f4;
 }

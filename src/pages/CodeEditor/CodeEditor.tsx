@@ -430,7 +430,15 @@ const CodeEditor: React.FC = () => {
         <Card className={outputClassName}>
           <Tabs isFitted variant="enclosed">
             <TabList>
-              <Tab>Test Output</Tab>
+              <Tab
+                className={
+                  evaluateData?.evaluate.isSuccessful
+                    ? "tab--success"
+                    : "tab--failure"
+                }
+              >
+                Test Output
+              </Tab>
               <Tab>Program Output</Tab>
               <Tab>Stats</Tab>
             </TabList>
@@ -441,7 +449,9 @@ const CodeEditor: React.FC = () => {
                 </pre>
               </TabPanel>
               <TabPanel>
-                <ConsoleOutput text={evaluateData?.evaluate.consoleOutput ?? ''} />
+                <ConsoleOutput
+                  text={evaluateData?.evaluate.consoleOutput ?? ""}
+                />
               </TabPanel>
               <TabPanel>
                 <Stats data={evaluateData?.evaluate} />

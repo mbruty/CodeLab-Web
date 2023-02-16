@@ -34,6 +34,7 @@ import UserContext from "contexts/UserContext";
 import { User } from "gql/graphql";
 import { graphql } from "gql";
 import { useMutation } from "@apollo/client";
+import CreatePage from "pages/Create";
 
 const logoutMutation = graphql(`
   mutation Logout {
@@ -103,6 +104,7 @@ export default function WithSubnavigation() {
         >
           {user ? (
             <Menu>
+              <Button variant={"link"} onClick={() => navigate("/create")}>Create</Button>
               <MenuButton
                 as={Button}
                 rounded={"full"}
@@ -268,4 +270,11 @@ export const NAV_ITEMS: Array<NavItem> = [
     isVisibleInNav: false,
     icon: undefined,
   },
+  {
+    component: CreatePage,
+    path: "/create",
+    text: "",
+    isVisibleInNav: false,
+    icon: undefined
+  }
 ];

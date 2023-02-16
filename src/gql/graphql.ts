@@ -267,6 +267,7 @@ export enum ErrorType {
 
 export type Module = {
   __typename?: 'Module';
+  canEdit?: Maybe<Scalars['Boolean']>;
   completedPct: Scalars['Float'];
   createdBy?: Maybe<User>;
   description: Scalars['String'];
