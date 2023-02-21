@@ -11,7 +11,10 @@ import {
   Grid,
   Heading,
   HStack,
+  Skeleton,
+  SkeletonText,
   Spinner,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -55,9 +58,22 @@ const ModulePage: FC = (props) => {
 
   if (loading) {
     return (
-      <Center>
-        <Spinner />
-      </Center>
+      <Stack spacing="2">
+        <Skeleton maxWidth="400">
+          <Heading as="h1">Module title</Heading>
+        </Skeleton>
+        <Skeleton>
+          <Text>Longer module description</Text>
+        </Skeleton>
+        <Grid gridTemplateColumns="repeat(4, 1fr)" marginTop="2" gap="2">
+          <Skeleton width="200" height="100" />
+          <Skeleton width="200" height="100" />
+          <Skeleton width="200" height="100" />
+          <Skeleton width="200" height="100" />
+          <Skeleton width="200" height="100" />
+          <Skeleton width="200" height="100" />
+        </Grid>
+      </Stack>
     );
   }
 
@@ -87,7 +103,12 @@ const ModulePage: FC = (props) => {
                 ))}
               </HStack>
               <FontAwesomeIcon
-                style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%) " }}
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%) ",
+                }}
                 icon={faChevronRight}
               />
             </Card>

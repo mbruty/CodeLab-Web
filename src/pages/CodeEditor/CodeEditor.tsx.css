@@ -130,6 +130,7 @@
 }
 
 .output {
+  padding: 0;
   transition: background-color 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) !important;
 }
 .output--success {

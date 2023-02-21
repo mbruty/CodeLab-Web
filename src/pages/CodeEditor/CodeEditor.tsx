@@ -11,13 +11,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Button,
   Card,
-  CardHeader,
   Divider,
   FormControl,
   FormLabel,
   HStack,
   Select,
-  Spinner,
+  Skeleton,
   Table,
   TableContainer,
   Tbody,
@@ -29,7 +28,6 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
-  faFloppyDisk,
   faPlay,
   faCloud,
   faArrowsRotate,
@@ -312,15 +310,12 @@ const CodeEditor: React.FC = () => {
 
   if (task === null) {
     return (
-      <div
-        style={{
-          display: "grid",
-          placeItems: "center",
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <Spinner />
+      <div className="code-zone">
+        <Skeleton className="code-zone--left" />
+        <VStack className="code-zone--right">
+          <Skeleton className="container--description"/>
+          <Skeleton className="container--output"/>
+        </VStack>
       </div>
     );
   }
