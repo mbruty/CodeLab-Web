@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import Home from "./pages/Home";
 import { NAV_ITEMS } from "components/Nav";
 import Nav from "./components/Nav";
 import UserContext from "./contexts/UserContext";
@@ -76,9 +75,8 @@ function App() {
         <Nav />
         <div className="content">
           <Routes>
-            <Route index element={<Home />} />
             {NAV_ITEMS.map((page) => (
-              <Route path={page.path} element={<page.component />} />
+              <Route index={page.path === '/'} path={page.path} element={<page.component />} />
             ))}
           </Routes>
         </div>

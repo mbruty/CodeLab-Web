@@ -7,8 +7,6 @@ import {
   Stack,
   Collapse,
   Link,
-  Popover,
-  PopoverTrigger,
   useColorModeValue,
   useDisclosure,
   Center,
@@ -258,9 +256,9 @@ export const NAV_ITEMS: Array<NavItem> = [
   },
   {
     component: Courses,
-    path: "/courses",
+    path: "/",
     text: "Courses",
-    isVisibleInNav: true,
+    isVisibleInNav: false,
     icon: faSchool,
   },
   {
