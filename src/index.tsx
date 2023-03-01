@@ -7,6 +7,7 @@ import { ApolloProvider } from "@apollo/client";
 import { client } from "./appoloClient";
 import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { StepsTheme as Steps } from 'chakra-ui-steps';
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,7 +20,7 @@ const config = {
 };
 
 // 3. extend the theme
-const theme = extendTheme({ config });
+const theme = extendTheme({ config, components: { Steps } });
 
 root.render(
   <React.StrictMode>
