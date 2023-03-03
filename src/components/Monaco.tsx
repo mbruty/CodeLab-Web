@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
@@ -11,9 +11,13 @@ interface IProps {
 }
 
 const Monaco: React.FC<IProps> = (props) => {
-  const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(
-    null
-  );
+  useEffect(() => {
+    if (props.onChange) {
+      props.onChange(props.codeText);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   function handleChange(value: string | undefined, event: any) {
     if (value && props.onChange !== undefined) {
