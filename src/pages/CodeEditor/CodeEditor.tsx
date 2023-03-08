@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import React from "react";
+import React, { useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Monaco from "../../components/Monaco";
 import { graphql } from "../../gql";
@@ -39,6 +39,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import ConsoleOutput from "components/ConsoleOutput";
+import FileViewer from "components/FileViewer";
 
 enum SaveState {
   SAVING,
@@ -197,22 +198,28 @@ const Stats: React.FC<{ data: CodeResponse | undefined }> = (props) => {
 };
 
 const getCode = graphql(`
-  query getCode($id: Int!, $language: String!) {
-    programmingTask(taskId: $id, language: $language) {
+  query getCode($id: ID!, $language: String!) {
+    programmingTask(taskId: $id) {
       id
       title
       description
-      starterCode
-      testCode
-      language
+      code(language: $language) {
+        starterCode
+        testCode
+        myCode
+        language
+      }
+      files {
+        fileName
+        fileText
+      }
       availableLanguages
-      myCode
     }
   }
 `);
 
 const evaluateQuery = graphql(`
-  query Evaluate($code: String!, $language: String!, $taskId: Int!) {
+  query Evaluate($code: String!, $language: String!, $taskId: ID!) {
     evaluate(code: $code, language: $language, taskId: $taskId) {
       output
       consoleOutput
@@ -250,8 +257,8 @@ const CodeEditor: React.FC = () => {
   const [canSubmit, setCanSubmit] = React.useState(false);
   const [skipChange, setSkipChange] = React.useState(false);
   // Ensure that we have a task id
-  const taskId = parseInt(params.taskid ?? "-1");
-  if (taskId === -1) {
+  const taskId = params.taskid ?? "-1";
+  if (taskId === "-1") {
     navigate("/modules");
   }
 
@@ -290,7 +297,7 @@ const CodeEditor: React.FC = () => {
   React.useEffect(() => {
     if (getCodeData) {
       if (selectedLanguage === "default") {
-        setSelectedLanguage(getCodeData.programmingTask.language ?? "");
+        setSelectedLanguage(getCodeData.programmingTask.code?.language ?? "");
       }
       setTask(getCodeData.programmingTask);
     }
@@ -308,27 +315,27 @@ const CodeEditor: React.FC = () => {
     }
   }, [saveLoading]);
 
+  const evaluateCode = () => {
+    if (!task) return; // Task should never be null if we have a task to run...
+    evaluate({
+      variables: {
+        code: task.code?.myCode ?? "",
+        language: selectedLanguage,
+        taskId,
+      },
+    });
+  };
+
   if (task === null) {
     return (
       <div className="code-zone">
         <Skeleton className="code-zone--left" />
         <VStack className="code-zone--right">
-          <Skeleton className="container--description"/>
-          <Skeleton className="container--output"/>
+          <Skeleton className="container--description" />
+          <Skeleton className="container--output" />
         </VStack>
       </div>
     );
-  }
-
-  function evaluateCode() {
-    if (!task) return; // Task should never be null if we have a task to run...
-    evaluate({
-      variables: {
-        code: task.myCode ?? "",
-        language: selectedLanguage,
-        taskId,
-      },
-    });
   }
 
   function handleSubmit() {}
@@ -342,7 +349,10 @@ const CodeEditor: React.FC = () => {
       setCanSubmit(false);
     }
     setTask((previous) => {
-      return { ...previous, myCode: code } as ProgrammingTask;
+      return {
+        ...previous,
+        code: { ...previous?.code, myCode: code },
+      } as ProgrammingTask;
     });
     clearTimeout(timeout);
     setSaveState(SaveState.UNSAVED);
@@ -369,6 +379,9 @@ const CodeEditor: React.FC = () => {
             <TabList>
               <Tab>Code</Tab>
               <Tab>Tests</Tab>
+              {getCodeData?.programmingTask.files?.map((file) => (
+                <Tab key={file.fileName}>{file.fileName}</Tab>
+              ))}
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -380,7 +393,15 @@ const CodeEditor: React.FC = () => {
                     setSelectedLanguage(x);
                   }}
                   handleReset={() => {
-                    setTask({ ...task, myCode: task.starterCode });
+                    setTask({
+                      ...task,
+                      code: {
+                        myCode: task.code?.starterCode ?? "",
+                        starterCode: task.code?.starterCode ?? "",
+                        testCode: task.code?.testCode ?? "",
+                        language: task.code?.language ?? "",
+                      },
+                    });
                   }}
                   handleRun={evaluateCode}
                   handleSubmit={handleSubmit}
@@ -391,7 +412,7 @@ const CodeEditor: React.FC = () => {
                 <Divider style={{ margin: "0.5rem 0" }} />
 
                 <Monaco
-                  codeText={task.myCode!}
+                  codeText={task.code?.myCode ?? ""}
                   height="calc(100vh - 1rem - 240px)"
                   language={selectedLanguage}
                   editable
@@ -403,11 +424,16 @@ const CodeEditor: React.FC = () => {
                 <Divider style={{ marginBottom: "0.5rem" }} />
                 <Monaco
                   editable={false}
-                  codeText={task.testCode ?? ""}
+                  codeText={task.code?.testCode ?? ""}
                   height="calc(100vh - 1rem - 160px)"
                   language={selectedLanguage}
                 />
               </TabPanel>
+              {getCodeData?.programmingTask.files?.map((file) => (
+                <TabPanel key={`viewer-${file.fileName}`}>
+                  <FileViewer file={file} />
+                </TabPanel>
+              ))}
             </TabPanels>
           </Tabs>
         </Card>
