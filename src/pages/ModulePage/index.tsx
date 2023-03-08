@@ -21,7 +21,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 const getModuleQuery = graphql(`
-  query getModule($moduleId: Int!) {
+  query getModule($moduleId: ID!) {
     module(moduleId: $moduleId) {
       title
       description
@@ -47,7 +47,7 @@ const ModulePage: FC = (props) => {
   const { moduleid } = useParams();
   const { data, error, loading } = useQuery(getModuleQuery, {
     variables: {
-      moduleId: parseInt(moduleid as string),
+      moduleId: moduleid!,
     },
   });
   const userObserver = useContext(UserContext);
