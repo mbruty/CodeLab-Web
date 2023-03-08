@@ -315,6 +315,8 @@ const CodeEditor: React.FC = () => {
     }
   }, [saveLoading]);
 
+
+
   const evaluateCode = () => {
     if (!task) return; // Task should never be null if we have a task to run...
     evaluate({
@@ -325,6 +327,18 @@ const CodeEditor: React.FC = () => {
       },
     });
   };
+
+  React.useEffect(() => {
+    document.onkeyup = (e) => {
+      if (e.key === "Enter" && e.ctrlKey) {
+        evaluateCode();
+      }
+    };
+
+    return () => {
+      document.onkeyup = null;
+    };
+  }, []);
 
   if (task === null) {
     return (
