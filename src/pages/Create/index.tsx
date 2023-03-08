@@ -21,6 +21,7 @@ import {
   Text,
   Box,
   HStack,
+  useToast,
 } from "@chakra-ui/react";
 import { faPlay, faRemove } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -53,15 +54,13 @@ const executeCodeQuery = graphql(`
     $code: String!
     $testCode: String!
     $language: String!
-    $fileContent: String!
-    $fileName: String!
+    $files: [FileInput]!
   ) {
     evaluateTest(
       code: $code
       testCode: $testCode
       language: $language
-      fileContent: $fileContent
-      fileName: $fileName
+      files: $files
     ) {
       consoleOutput
       output
@@ -69,7 +68,15 @@ const executeCodeQuery = graphql(`
     }
   }
 `);
+
+const createModuleMutation = graphql(`
+  mutation CreateModule($title: String!, $description: String!) {
+    createModule(moduleTitle: $title, moduleDescription: $description)
+  }
+`);
+
 const CreatePage: FC = (props) => {
+  const toast = useToast();
   const { nextStep, prevStep, activeStep } = useSteps({
     initialStep: 0,
   });
@@ -89,6 +96,10 @@ const CreatePage: FC = (props) => {
 
   const [testOutput, setTestOutput] = useState("");
   const [consoleOutput, setConsoleOutput] = useState("");
+  const [newModuleData, setNewModuleData] = useState({
+    moduleTitle: "",
+    moduleDescription: "",
+  });
 
   const onDrop = useCallback(
     (acceptedFiles: Array<File>) => {
@@ -150,15 +161,28 @@ const CreatePage: FC = (props) => {
   }
 
   function next() {
+    if (selectedLanguages.length === 0) {
+      toast({
+        title: "Error: No languages selected",
+        description: "To continue, please select at least one language",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+    if (activeStep === 3 + selectedLanguages.length - 1) {
+      return;
+    }
     setTestOutput("");
     nextStep();
   }
 
   function handleModuleSelect(e: any) {
     const value = e.target.value;
-    const id =
+    let id =
       moduleData?.editableModules.find((x) => x?.title === value)?.id ?? "-1";
-
+    if (value === "Create a new module") id = "-2";
     setSelectedModuleId(parseInt(id));
   }
 
@@ -168,8 +192,7 @@ const CreatePage: FC = (props) => {
         code: codeTexts[language].starterCode,
         testCode: codeTexts[language].testCode,
         language: language,
-        fileContent: "",
-        fileName: "",
+        files: files.map((x) => ({ fileName: x.fileName, text: x.fileText })),
       },
     });
   }
@@ -298,7 +321,7 @@ const CreatePage: FC = (props) => {
                     </Stack>
                   </TabPanel>
                   <TabPanel>
-                    <pre>{testOutput}</pre>
+                    <pre className="code-output">{testOutput}</pre>
                   </TabPanel>
                   <TabPanel>
                     <pre>{consoleOutput}</pre>
@@ -331,16 +354,48 @@ const CreatePage: FC = (props) => {
             label="Link to a module"
           >
             <CardHeader>
-              <Heading as="h1">Link to a module</Heading>
+              <Heading as="h1">Link a module</Heading>
             </CardHeader>
             <CardBody>
               <Center>
-                <Select onChange={handleModuleSelect} maxW="lg">
-                  <option value="None">None</option>
-                  {moduleData?.editableModules.map((m) => (
-                    <option value={m?.title}>{m?.title}</option>
-                  ))}
-                </Select>
+                <VStack spacing={6}>
+                  <Select onChange={handleModuleSelect} maxW="lg">
+                    <option value="None">None</option>
+                    {moduleData?.editableModules.map((m) => (
+                      <option value={m?.title}>{m?.title}</option>
+                    ))}
+                    <option value="Create a new module">
+                      Create a new module
+                    </option>
+                  </Select>
+                  {selectedModuleId === -2 && (
+                    <VStack alignItems="flex-start">
+                      <Heading as="h2">Create a module</Heading>
+                      <label htmlFor="module-title">Module title</label>
+                      <Input
+                        id="module-title"
+                        value={newModuleData.moduleTitle}
+                        onChange={(e) =>
+                          setNewModuleData({
+                            ...newModuleData,
+                            moduleTitle: e.target.value,
+                          })
+                        }
+                      />
+                      <label htmlFor="module-desc">Module description</label>
+                      <Input
+                        id="module-desc"
+                        value={newModuleData.moduleDescription}
+                        onChange={(e) =>
+                          setNewModuleData({
+                            ...newModuleData,
+                            moduleDescription: e.target.value,
+                          })
+                        }
+                      />
+                    </VStack>
+                  )}
+                </VStack>
               </Center>
             </CardBody>
           </Step>
@@ -356,7 +411,7 @@ const CreatePage: FC = (props) => {
             Back
           </Button>
           <Button size="sm" onClick={next}>
-            {activeStep === 1 ? "Save" : "Next"}
+            {activeStep === 3 + selectedLanguages.length - 1 ? "Save" : "Next"}
           </Button>
         </Flex>
       </Card>
