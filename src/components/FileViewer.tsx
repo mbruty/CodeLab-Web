@@ -1,8 +1,6 @@
 import {
   Checkbox,
-  Divider,
   Flex,
-  StackDivider,
   Table,
   TableContainer,
   Tbody,
@@ -11,7 +9,6 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { File } from "gql/graphql";
 import { FC, useState, useMemo, useRef } from "react";
 
