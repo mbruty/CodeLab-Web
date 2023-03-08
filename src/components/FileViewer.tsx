@@ -58,11 +58,9 @@ const CsvViewer: FC<ViewerProps> = (props) => {
             >
               <Tr>
                 {withHeaders &&
-                  datapoints
-                    .shift()
-                    ?.map((header) => (
-                      <Th key={header}>{header.replaceAll('"', "")}</Th>
-                    ))}
+                  datapoints[0]?.map((header) => (
+                    <Th key={header}>{header.replaceAll('"', "")}</Th>
+                  ))}
                 {!withHeaders &&
                   datapoints[0].map((_, index) => (
                     <Th key={"header" + index}>{index}</Th>
@@ -70,7 +68,7 @@ const CsvViewer: FC<ViewerProps> = (props) => {
               </Tr>
             </Thead>
             <Tbody>
-              {datapoints.map((line, index) => (
+              {datapoints.slice(withHeaders ? 1 : 0).map((line, index) => (
                 <Tr key={`line-${index}`}>
                   {line.map((point, index) => (
                     <Td key={index} isNumeric={!isNaN(parseFloat(point))}>
