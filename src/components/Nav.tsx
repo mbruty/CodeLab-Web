@@ -102,13 +102,16 @@ export default function WithSubnavigation() {
         >
           {user ? (
             <Menu>
-              <Button variant={"link"} onClick={() => navigate("/create")}>Create</Button>
+              <Button variant={"link"} onClick={() => navigate("/create")}>
+                Create
+              </Button>
               <MenuButton
                 as={Button}
                 rounded={"full"}
                 variant={"link"}
                 cursor={"pointer"}
                 minW={0}
+                aria-label="Profile"
               >
                 <Avatar
                   src={`https://api.dicebear.com/5.x/adventurer/svg?seed=${user.username}`}
@@ -273,6 +276,6 @@ export const NAV_ITEMS: Array<NavItem> = [
     path: "/create",
     text: "",
     isVisibleInNav: false,
-    icon: undefined
-  }
+    icon: undefined,
+  },
 ];

@@ -87,6 +87,7 @@ const Courses: React.FC = () => {
             height={200}
             width={200}
             data={data}
+            aria-label="Overview chart"
             options={{ maintainAspectRatio: false, responsive: false }}
           />
           <Grid
@@ -127,6 +128,7 @@ const Courses: React.FC = () => {
                         <Doughnut
                           height={74}
                           width={74}
+                          aria-label="Completion percentage"
                           data={{
                             datasets: [
                               {
