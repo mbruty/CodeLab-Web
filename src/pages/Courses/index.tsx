@@ -114,7 +114,7 @@ const Courses: React.FC = () => {
           </Heading>
           <Grid
             templateColumns="repeat(2, 1fr)"
-            gap="1"
+            gap="1rem"
             style={{ marginTop: "1rem", width: "100%" }}
           >
             {modules &&
@@ -125,7 +125,7 @@ const Courses: React.FC = () => {
                       <Heading as="h3" fontSize="lg">
                         {item?.title}
                       </Heading>
-                      <div style={{ position: "relative" }}>
+                      <div style={{ position: "relative", marginRight: "0", marginLeft: "auto" }}>
                         <Doughnut
                           height={74}
                           width={74}
