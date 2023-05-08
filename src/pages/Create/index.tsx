@@ -78,21 +78,19 @@ const createModuleMutation = graphql(`
 `);
 
 const createTaskMutation = graphql(`
-  mutation CreateTask(
-    $moduleID: ID!
-    $title: String!
-    $description: String!
-    $code: [StarterCodeInput]!
-    $files: [FileInput]!
-  ) {
-    createTask(
-      moduleID: $moduleID
-      title: $title
-      description: $description
-      starterCodes: $code
-      files: $files
-    )
-  }
+mutation CreateTask(
+  $title: String!
+  $description: String!
+  $code: [StarterCodeInput]!
+  $files: [FileInput]!
+) {
+  createTask(
+    title: $title
+    description: $description
+    starterCodes: $code
+    files: $files
+  )
+}
 `);
 const CreatePage: FC = (props) => {
   const toast = useToast();

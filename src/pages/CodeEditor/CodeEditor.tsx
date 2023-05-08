@@ -353,7 +353,6 @@ const CodeEditor: React.FC = () => {
           submission: {
             codeText: code,
             taskId,
-            isSubmitted: false,
             language: selectedLanguage,
           },
         },

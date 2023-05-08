@@ -23,6 +23,7 @@ const myModules = graphql(`
       id
       title
       completedPct
+      description
     }
   }
 `);
@@ -159,15 +160,14 @@ const Courses: React.FC = () => {
       <Card style={{ padding: "0 1rem", overflow: "scroll" }}>
         <Heading as="h2">Recently Accessed Courses</Heading>
         <Divider />
-        {/* {modules.map((item) => (
-          <>
-            <h3>{item.name}</h3>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore,
-              libero.
-            </p>
-          </>
-        ))} */}
+        {modules?.myModules.map((item: any) => (
+          <Card style={{ margin: "0.5rem 0", padding: "0.5rem" }}>
+            <Heading as="h3" fontSize="lg">
+              {item?.title}
+            </Heading>
+            <p>{item.description}</p>
+          </Card>
+        ))}
         <Divider />
         <Heading as="h2">Popular Free Courses</Heading>
         <Divider />
