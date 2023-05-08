@@ -35,11 +35,10 @@ import {
   faExclamation,
   faCloudBolt,
 } from "@fortawesome/free-solid-svg-icons";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import ConsoleOutput from "components/ConsoleOutput";
 import FileViewer from "components/FileViewer";
+import MarkdownEditor from "@uiw/react-markdown-editor";
 
 enum SaveState {
   SAVING,
@@ -89,7 +88,6 @@ interface IToolBarProps {
   handleChange: (language: string) => void;
   handleReset: () => void;
   handleRun: () => void;
-  handleSubmit: () => void;
   runCodeIsLoading: boolean;
   saveState: SaveState;
   canSubmit: boolean;
@@ -135,18 +133,6 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
       >
         Reset
       </Button>
-      {/* {props.canSubmit && (
-        <Button
-          isLoading={props.runCodeIsLoading}
-          leftIcon={<FontAwesomeIcon icon={faFloppyDisk} />}
-          colorScheme="whatsapp"
-          variant="solid"
-          onClick={props.handleSubmit}
-        >
-          Submit Code
-        </Button>
-      )}
-      {!props.canSubmit && ( */}
       <Button
         id="run-code"
         style={{ marginRight: "1rem" }}
@@ -158,7 +144,6 @@ const ToolBar: React.FC<IToolBarProps> = (props) => {
       >
         Run Code
       </Button>
-      {/* )} */}
     </HStack>
   );
 };
@@ -278,12 +263,6 @@ const CodeEditor: React.FC = () => {
   React.useEffect(() => {
     if (evaluateLoading) return;
     if (!evaluateData) return;
-    if (evaluateData?.evaluate.isSuccessful) {
-      setOttputClassName("container container--output output output--success");
-      setCanSubmit(true);
-    } else {
-      setOttputClassName("container container--output output output--failure");
-    }
 
     const timeout = setTimeout(() => {
       setOttputClassName("container container--output output");
@@ -315,9 +294,7 @@ const CodeEditor: React.FC = () => {
     }
   }, [saveLoading]);
 
-
-
-  const evaluateCode = () => {
+  const evaluateCode = useCallback(() => {
     if (!task) return; // Task should never be null if we have a task to run...
     evaluate({
       variables: {
@@ -326,11 +303,12 @@ const CodeEditor: React.FC = () => {
         taskId,
       },
     });
-  };
+  }, [evaluate, selectedLanguage, task, taskId]);
 
   React.useEffect(() => {
     document.onkeyup = (e) => {
-      if (e.key === "Enter" && e.ctrlKey) {
+      // Windows ctrl || MacOS Cmd
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
         evaluateCode();
       }
     };
@@ -338,7 +316,7 @@ const CodeEditor: React.FC = () => {
     return () => {
       document.onkeyup = null;
     };
-  }, []);
+  }, [evaluateCode]);
 
   if (task === null) {
     return (
@@ -351,8 +329,6 @@ const CodeEditor: React.FC = () => {
       </div>
     );
   }
-
-  function handleSubmit() {}
 
   function onCodeUpdated(code: string) {
     // If they could previously submit, but they've changed some code, disable it again
@@ -377,12 +353,18 @@ const CodeEditor: React.FC = () => {
           submission: {
             codeText: code,
             taskId,
+            isSubmitted: false,
             language: selectedLanguage,
           },
         },
       });
     }, 1000) as unknown as number;
     updateTimeout(t1);
+  }
+
+  let testOutputAddition = "";
+  if (evaluateData !== null) {
+    testOutputAddition = evaluateData?.evaluate.isSuccessful ? "✅" : "❌";
   }
 
   return (
@@ -418,7 +400,6 @@ const CodeEditor: React.FC = () => {
                     });
                   }}
                   handleRun={evaluateCode}
-                  handleSubmit={handleSubmit}
                   saveState={saveState}
                   runCodeIsLoading={evaluateLoading}
                   canSubmit={canSubmit}
@@ -455,25 +436,12 @@ const CodeEditor: React.FC = () => {
       </div>
       <VStack className="code-zone--right">
         <Card className="container container--description">
-          <h2>Task</h2>
-          <Divider />
-          <ReactMarkdown
-            children={task.description}
-            remarkPlugins={[remarkGfm]}
-          />
+          <MarkdownEditor.Markdown source={task.description} />
         </Card>
         <Card className={outputClassName}>
           <Tabs isFitted variant="enclosed">
             <TabList>
-              <Tab
-                className={
-                  evaluateData?.evaluate.isSuccessful
-                    ? "tab--success"
-                    : "tab--failure"
-                }
-              >
-                Test Output
-              </Tab>
+              <Tab>Test Output {testOutputAddition}</Tab>
               <Tab>Program Output</Tab>
               <Tab>Stats</Tab>
             </TabList>

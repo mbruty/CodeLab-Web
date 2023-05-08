@@ -71,9 +71,7 @@ const CsvViewer: FC<ViewerProps> = (props) => {
               {datapoints.slice(withHeaders ? 1 : 0).map((line, index) => (
                 <Tr key={`line-${index}`}>
                   {line.map((point, index) => (
-                    <Td key={index} isNumeric={!isNaN(parseFloat(point))}>
-                      {point.replaceAll('"', "")}
-                    </Td>
+                    <Td key={index}>{point.replaceAll('"', "")}</Td>
                   ))}
                 </Tr>
               ))}

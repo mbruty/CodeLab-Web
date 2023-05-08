@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Card,
@@ -22,6 +22,8 @@ import {
   Box,
   HStack,
   useToast,
+  FormLabel,
+  Textarea,
 } from "@chakra-ui/react";
 import { faPlay, faRemove } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -75,14 +77,36 @@ const createModuleMutation = graphql(`
   }
 `);
 
+const createTaskMutation = graphql(`
+  mutation CreateTask(
+    $moduleID: ID!
+    $title: String!
+    $description: String!
+    $code: [StarterCodeInput]!
+    $files: [FileInput]!
+  ) {
+    createTask(
+      moduleID: $moduleID
+      title: $title
+      description: $description
+      starterCodes: $code
+      files: $files
+    )
+  }
+`);
 const CreatePage: FC = (props) => {
   const toast = useToast();
   const { nextStep, prevStep, activeStep } = useSteps({
     initialStep: 0,
   });
+  const [createModule, { loading: createModuleLoading }] =
+    useMutation(createModuleMutation);
+  const [createTask, { loading: createTaskLoading }] =
+    useMutation(createTaskMutation);
   const [taskDescription, setTaskDescription] = useState("");
+  const [taskTitle, setTaskTitle] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState<Array<string>>([]);
-  const [selectedModuleId, setSelectedModuleId] = useState(-1);
+  const [selectedModuleId, setSelectedModuleId] = useState("-1");
   const [files, setFiles] = useState<
     Array<{ id: string; fileName: string; fileText: string }>
   >([]);
@@ -172,6 +196,7 @@ const CreatePage: FC = (props) => {
       return;
     }
     if (activeStep === 3 + selectedLanguages.length - 1) {
+      save();
       return;
     }
     setTestOutput("");
@@ -183,7 +208,7 @@ const CreatePage: FC = (props) => {
     let id =
       moduleData?.editableModules.find((x) => x?.title === value)?.id ?? "-1";
     if (value === "Create a new module") id = "-2";
-    setSelectedModuleId(parseInt(id));
+    setSelectedModuleId(id);
   }
 
   function onTestCodeClick(language: string) {
@@ -211,6 +236,49 @@ const CreatePage: FC = (props) => {
         return x;
       });
     });
+  }
+
+  async function save() {
+    if (selectedModuleId === "-2") {
+      if (!newModuleData.moduleTitle) {
+        toast({
+          title: "Error: Module title empty",
+          description: "Please provide a name for the module",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+      if (!newModuleData.moduleDescription) {
+        toast({
+          title: "Error: Module Description empty",
+          description: "Pleaes provide a description for the module",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+      const result = await createModule({
+        variables: {
+          title: newModuleData.moduleTitle,
+          description: newModuleData.moduleDescription,
+        },
+      });
+
+      const created = result.data?.createModule;
+      if (!created) return;
+
+      // const taskResult = await createTask({
+      //   variables: {
+      //     code: selectedLanguages.map(language => ({
+      //       language: language
+      //     }))
+      //   }
+      // })
+
+    }
   }
 
   if (loading) return null;
@@ -334,19 +402,33 @@ const CreatePage: FC = (props) => {
             key={`desc-${selectedLanguages.length}`}
             label="Add a description"
           >
-            <CardHeader>
-              <Heading as="h1">Create a task</Heading>
-            </CardHeader>
             <CardBody>
-              <Heading as="h2" fontSize="x-large">
-                Task text
-              </Heading>
-              <MarkdownEditor
-                height="30ch"
-                visible
-                value={taskDescription}
-                onChange={setTaskDescription}
-              />
+              <Stack spacing="1rem">
+                <div>
+                  <FormLabel
+                    fontWeight="bold"
+                    fontSize="x-large"
+                    htmlFor="title"
+                  >
+                    Task Title
+                  </FormLabel>
+                  <Input
+                    id="title"
+                    type="text"
+                    value={taskTitle}
+                    onChange={(e) => setTaskTitle(e.target.value)}
+                  />
+                </div>
+                <Heading as="h2" fontSize="x-large">
+                  Task text
+                </Heading>
+                <MarkdownEditor
+                  height="30ch"
+                  visible
+                  value={taskDescription}
+                  onChange={setTaskDescription}
+                />
+              </Stack>
             </CardBody>
           </Step>
           <Step
@@ -368,7 +450,7 @@ const CreatePage: FC = (props) => {
                       Create a new module
                     </option>
                   </Select>
-                  {selectedModuleId === -2 && (
+                  {selectedModuleId === "-2" && (
                     <VStack alignItems="flex-start">
                       <Heading as="h2">Create a module</Heading>
                       <label htmlFor="module-title">Module title</label>
@@ -383,7 +465,7 @@ const CreatePage: FC = (props) => {
                         }
                       />
                       <label htmlFor="module-desc">Module description</label>
-                      <Input
+                      <Textarea
                         id="module-desc"
                         value={newModuleData.moduleDescription}
                         onChange={(e) =>
@@ -410,7 +492,11 @@ const CreatePage: FC = (props) => {
           >
             Back
           </Button>
-          <Button size="sm" onClick={next}>
+          <Button
+            isLoading={createModuleLoading || createTaskLoading}
+            size="sm"
+            onClick={next}
+          >
             {activeStep === 3 + selectedLanguages.length - 1 ? "Save" : "Next"}
           </Button>
         </Flex>
