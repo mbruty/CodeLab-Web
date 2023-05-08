@@ -106,7 +106,7 @@ const Courses: React.FC = () => {
             ))}
           </Grid>
         </HStack>
-        <div>
+        <div style={{ width: "100%" }}>
           <Divider style={{ marginTop: "2rem" }} />
           <Heading as="h2" fontSize="xx-large">
             Enroled Modules
@@ -114,7 +114,7 @@ const Courses: React.FC = () => {
           <Grid
             templateColumns="repeat(2, 1fr)"
             gap="1"
-            style={{ marginTop: "1rem" }}
+            style={{ marginTop: "1rem", width: "100%" }}
           >
             {modules &&
               modules.myModules.map((item, idx) => (
