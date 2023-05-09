@@ -1,4 +1,6 @@
 # CodeLab - Website
+[Live Site](https://code-lab.bruty.net)
+
 ## Navigation
 Website
 
