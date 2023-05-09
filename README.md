@@ -1,46 +1,62 @@
-# Getting Started with Create React App
+# CodeLab - Website
+## Navigation
+Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[API](https://github.com/mbruty/mike-CodeLab-Graphql)
 
-## Available Scripts
+[CodeEngine](https://github.com/mbruty/mike-CodeLab-CodeEngine)
 
-In the project directory, you can run:
+[Docker Scheduler](https://github.com/mbruty/mike-CodeLab-Scheduler)
 
-### `npm start`
+## Project Vision
+Many software developers rely on online coding platforms, such as LeetCode, to enhance their knowledge. These platforms have been successful with students who want to expand their learning beyond what is taught. These platforms could also be helpful in educational institutions to teach software development. However, the current platform’s lack the ability for teachers to create tasks and courses, and they do not provide enough insight into the effects of optimisations on the users' code.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The CodeLab platform aims to bring online coding platforms to the education sector. CodeLab offers the same features as the majority of online coding platforms. CodeLab also offers a way for teachers to create tasks, and group the into modules. For students, CodeLab offers more detailed utilisation statistics than other platform. CodeLab also does not limit usage to only algorithm-style questions and facilitates a wider bredth of teaching.
+## Development Setup
+Ensure that you have Node.js version 18 or newer.
+ 1. Clone the repository
+ 2. Run `npm install`
+ 3. Run `npm run start`
+ 4. If you are not running the API locally, change the URL in config.ts to "https://gql.bruty.net"
+### Building
+Run `npm run build`
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Setup
+Ensure that you have yout GitHub personal-access-token linked to docker.
 
-### `npm test`
+### Docker
+ 1. Run `docker pull ghcr.io/mbruty/mike-codelab-web/code-labs-web:latest`.
+ 2. Run `docker run --rm ghcr.io/mbruty/mike-codelab-web/code-labs-web:latest`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Docker Compose
+Run `docker pull ghcr.io/mbruty/mike-codelab-web/code-labs-web:latest`.
+```yaml
+web:
+    image: ghcr.io/mbruty/mike-codelab-web/code-labs-web:latest
+    restart: always
+    ports:
+        - 3000:3000
+```
 
-### `npm run build`
+## Technologies uesd
+|Name|Version|
+|--|--|
+|Node.js|18.2.0|
+| @apollo/client | ^3.7.0 |
+|@chakra-ui/react|^2.4.9|
+|@fortawesome/react-fontawesome|^0.2.0|
+|@graphql-codegen/cli|^2.13.7|
+|@monaco-editor/react|^4.4.6|
+|@uiw/react-markdown-editor|^5.11.1|
+|chart.js|^3.9.1|
+|cypress|^10.11.0|
+|eslint|^8.2.0|
+|eslint-config-airbnb-typescript|^17.0.0|
+|eslint-plugin-cypress|^2.12.1|
+|eslint-plugin-react|^7.28.0|
+|graphql|^16.6.0|
+|guid-typescript|^1.0.9|
+|react|^18.2.0|
+|typescript|^4.8.4|
+|yup|0.32.11"|
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
