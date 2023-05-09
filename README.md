@@ -17,6 +17,7 @@ Ensure that you have Node.js version 18 or newer.
  1. Clone the repository
  2. Run `npm install`
  3. Run `npm run start`
+ 4. If you are not running the API locally, change the URL in config.ts to "https://gql.bruty.net"
 ### Building
 Run `npm run build`
 
